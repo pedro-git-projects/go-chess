@@ -1,11 +1,5 @@
-import * as React from 'react';
+import {GetBoard} from "./components/GetBoard"
 
-function App() {
-return (
-    <div>
-      <h1>Hello React</h1>
-    </div>
-  );
-}
+const App = () =>  <GetBoard/> 
 
 export default App
