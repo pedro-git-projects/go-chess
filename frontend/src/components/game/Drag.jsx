@@ -15,4 +15,13 @@ export const GameBoard = () => (
   </div>
 )
 
+const drag = () => {
+  const king = document.querySelector(".chess-piece")
+  const getSquares = document.querySelectorAll(".square")
+  king.addEventListener('dragStart', dragStart)
+}
 
+
+const dragStart = (e) => {
+  console.log(e.target)
+}

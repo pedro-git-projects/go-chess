@@ -1,0 +1,18 @@
+2. Player information: Each player's name and score should be displayed prominently on the screen.
+
+3. Timer: A timer should be included to keep track of each player's time.
+
+4. Move history: A move history should be displayed to allow players to review their previous moves.
+
+5. Chat feature: A chat feature should be included to allow players to communicate with each other during the game.
+
+6. Menu bar: A menu bar should be included to allow players to access additional features, such as changing the board design or accessing game rules.
+
+7. Promotions: The website should promote upcoming tournaments, events, or other chess-related content.
+
+https://developer.mozilla.org/en-US/docs/Learn/CSS/Howto/Fill_a_box_with_an_image
+https://www.youtube.com/watch?v=QCnZbK7vzSQ
+https://www.youtube.com/watch?v=elgqxmdVms8&list=PL5f_mz_zU5eXWYDXHUDOLBE0scnuJofO0
+https://headlessui.com/react/menu
+https://www.npmjs.com/package/@headlessui/react
+https://www.npmjs.com/package/heroicons#react
