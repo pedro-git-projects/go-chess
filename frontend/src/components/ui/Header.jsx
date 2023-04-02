@@ -1,4 +1,5 @@
 import { useState } from "react"
+import {Link} from "react-router-dom"
 
 import logo from "../../assets/white_king.svg"
 const Header = () => {
@@ -11,9 +12,9 @@ const Header = () => {
   return (
     <nav className={`flex items-center top-0 ${goGradient}`}>
       <div className="flex items-center p-2 gap-2">
-        <a href="/nada"> <img src={logo} alt="white King" width={50}/></a>
+        <Link to={`/`}> <img src={logo} alt="white King" width={50}/> </Link>
         <div className={`${logoText}`}>
-          <a href="">Go Chess</a>
+          <Link to={`/`}> Go Chess </Link> 
         </div>
       </div>
 
@@ -43,16 +44,16 @@ const Header = () => {
               : "hidden"
         }`}>
           <div className={`${mobileItem}`}>
-            <a href="">Home</a> 
+            <Link to={`/`}>Home</Link>  
           </div>
           <div className={`${mobileItem}`}>
-            <a href="">Play</a> 
+            <Link to={`/play`}>Play</Link>  
           </div>
           <div className={`${mobileItem}`}>
-            <a href="">Learn</a> 
+            <Link to={`/learn`}>Learn</Link>  
           </div>
           <div className={`${mobileItem}`}>
-            <a href="">Sign in</a> 
+            <Link to={`/signin`}>Sign In</Link>  
           </div>
         </div>
       </button>
@@ -60,16 +61,16 @@ const Header = () => {
       {/* desktop nav */}
       <div className="hidden md:flex flex-1 items-center justify-end">
         <div className={`${menuItem}`}>
-          <a href="">Home</a> 
+          <Link to={`/`}>Home</Link>  
         </div>
         <div className={`${menuItem}`}>
-          <a href="">Play</a> 
+          <Link to={`/play`}>Play</Link>  
         </div>
         <div className={`${menuItem}`}>
-          <a href="">Learn</a> 
+          <Link to={`/learn`}>Learn</Link>  
         </div>
         <div className={`${menuItem}`}>
-          <a href="">Sign in</a> 
+          <Link to={`/signin`}>Sign In</Link>  
         </div>
       </div>
     </nav>
