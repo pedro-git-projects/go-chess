@@ -5,7 +5,8 @@ import Err from './components/routes/Err'
 import Learn from './components/routes/Learn'
 import Play from './components/routes/Play'
 import Root from './components/routes/Root'
-import SiginIn from './components/routes/Signin'
+import SignIn from './components/routes/Signin'
+import SignUp from './components/routes/Signup'
 import "./styles/layout.css"
 
 const router = createBrowserRouter([
@@ -24,7 +25,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/signin",
-    element: <SiginIn/>, 
+    element: <SignIn/>, 
+  },
+  {
+    path: "/signup",
+    element: <SignUp/>, 
   },
 ])
 

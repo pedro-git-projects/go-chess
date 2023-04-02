@@ -1,5 +1,5 @@
 import { useState } from "react"
-import {Link} from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import logo from "../../assets/white_king.svg"
 const Header = () => {
@@ -53,7 +53,7 @@ const Header = () => {
             Learn
           </Link>  
           <Link to={`/signin`} className={`${mobileItem}`}>
-            Sign In
+            Sign in
           </Link>  
         </div>
       </button>
@@ -70,7 +70,7 @@ const Header = () => {
           Learn
         </Link>  
         <Link to={`/signin`} className={`${menuItem}`}>
-          Sign In
+          Sign in
         </Link>  
       </div>
     </nav>
