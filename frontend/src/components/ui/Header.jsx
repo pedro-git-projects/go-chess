@@ -43,35 +43,35 @@ const Header = () => {
               ? "block" 
               : "hidden"
         }`}>
-          <div className={`${mobileItem}`}>
-            <Link to={`/`}>Home</Link>  
-          </div>
-          <div className={`${mobileItem}`}>
-            <Link to={`/play`}>Play</Link>  
-          </div>
-          <div className={`${mobileItem}`}>
-            <Link to={`/learn`}>Learn</Link>  
-          </div>
-          <div className={`${mobileItem}`}>
-            <Link to={`/signin`}>Sign In</Link>  
-          </div>
+          <Link to={`/`} className={`${mobileItem}`}>
+            Home
+          </Link>  
+          <Link to={`/play`} className={`${mobileItem}`}>
+            Play  
+          </Link>
+          <Link to={`/learn`} className={`${mobileItem}`}>
+            Learn
+          </Link>  
+          <Link to={`/signin`} className={`${mobileItem}`}>
+            Sign In
+          </Link>  
         </div>
       </button>
 
       {/* desktop nav */}
       <div className="hidden md:flex flex-1 items-center justify-end">
-        <div className={`${menuItem}`}>
-          <Link to={`/`}>Home</Link>  
-        </div>
-        <div className={`${menuItem}`}>
-          <Link to={`/play`}>Play</Link>  
-        </div>
-        <div className={`${menuItem}`}>
-          <Link to={`/learn`}>Learn</Link>  
-        </div>
-        <div className={`${menuItem}`}>
-          <Link to={`/signin`}>Sign In</Link>  
-        </div>
+        <Link to={`/`} className={`${menuItem}`}>
+          Home
+        </Link>  
+        <Link to={`/play`} className={`${menuItem}`}>
+          Play  
+        </Link>
+        <Link to={`/learn`} className={`${menuItem}`}>
+          Learn
+        </Link>  
+        <Link to={`/signin`} className={`${menuItem}`}>
+          Sign In
+        </Link>  
       </div>
     </nav>
   ) 
