@@ -1,4 +1,5 @@
 import { useState } from "react"
+import {Link} from "react-router-dom"
 
 import logo from "../../assets/white_king.svg"
 const Header = () => {
@@ -11,9 +12,9 @@ const Header = () => {
   return (
     <nav className={`flex items-center top-0 ${goGradient}`}>
       <div className="flex items-center p-2 gap-2">
-        <img src={logo} alt="white King" width={50}/>
+        <Link to={`/`}> <img src={logo} alt="white King" width={50}/> </Link>
         <div className={`${logoText}`}>
-          Go Chess
+          <Link to={`/`}> Go Chess </Link> 
         </div>
       </div>
 
@@ -42,19 +43,35 @@ const Header = () => {
               ? "block" 
               : "hidden"
         }`}>
-          <div className={`${mobileItem}`}>Home</div>
-          <div className={`${mobileItem}`}>Play</div>
-          <div className={`${mobileItem}`}>Learn</div>
-          <div className={`${mobileItem}`}>Sign in</div>
+          <div className={`${mobileItem}`}>
+            <Link to={`/`}>Home</Link>  
+          </div>
+          <div className={`${mobileItem}`}>
+            <Link to={`/play`}>Play</Link>  
+          </div>
+          <div className={`${mobileItem}`}>
+            <Link to={`/learn`}>Learn</Link>  
+          </div>
+          <div className={`${mobileItem}`}>
+            <Link to={`/signin`}>Sign In</Link>  
+          </div>
         </div>
       </button>
 
       {/* desktop nav */}
       <div className="hidden md:flex flex-1 items-center justify-end">
-        <div className={`${menuItem}`}>Home</div>
-        <div className={`${menuItem}`}>Play</div>
-        <div className={`${menuItem}`}>Learn</div>
-        <div className={`${menuItem}`}>Sign in</div>
+        <div className={`${menuItem}`}>
+          <Link to={`/`}>Home</Link>  
+        </div>
+        <div className={`${menuItem}`}>
+          <Link to={`/play`}>Play</Link>  
+        </div>
+        <div className={`${menuItem}`}>
+          <Link to={`/learn`}>Learn</Link>  
+        </div>
+        <div className={`${menuItem}`}>
+          <Link to={`/signin`}>Sign In</Link>  
+        </div>
       </div>
     </nav>
   ) 
