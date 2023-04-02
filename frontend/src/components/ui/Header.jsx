@@ -11,9 +11,9 @@ const Header = () => {
   return (
     <nav className={`flex items-center top-0 ${goGradient}`}>
       <div className="flex items-center p-2 gap-2">
-        <img src={logo} alt="white King" width={50}/>
+        <a href="/nada"> <img src={logo} alt="white King" width={50}/></a>
         <div className={`${logoText}`}>
-          Go Chess
+          <a href="">Go Chess</a>
         </div>
       </div>
 
@@ -42,19 +42,35 @@ const Header = () => {
               ? "block" 
               : "hidden"
         }`}>
-          <div className={`${mobileItem}`}>Home</div>
-          <div className={`${mobileItem}`}>Play</div>
-          <div className={`${mobileItem}`}>Learn</div>
-          <div className={`${mobileItem}`}>Sign in</div>
+          <div className={`${mobileItem}`}>
+            <a href="">Home</a> 
+          </div>
+          <div className={`${mobileItem}`}>
+            <a href="">Play</a> 
+          </div>
+          <div className={`${mobileItem}`}>
+            <a href="">Learn</a> 
+          </div>
+          <div className={`${mobileItem}`}>
+            <a href="">Sign in</a> 
+          </div>
         </div>
       </button>
 
       {/* desktop nav */}
       <div className="hidden md:flex flex-1 items-center justify-end">
-        <div className={`${menuItem}`}>Home</div>
-        <div className={`${menuItem}`}>Play</div>
-        <div className={`${menuItem}`}>Learn</div>
-        <div className={`${menuItem}`}>Sign in</div>
+        <div className={`${menuItem}`}>
+          <a href="">Home</a> 
+        </div>
+        <div className={`${menuItem}`}>
+          <a href="">Play</a> 
+        </div>
+        <div className={`${menuItem}`}>
+          <a href="">Learn</a> 
+        </div>
+        <div className={`${menuItem}`}>
+          <a href="">Sign in</a> 
+        </div>
       </div>
     </nav>
   ) 
