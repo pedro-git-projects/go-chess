@@ -3,6 +3,7 @@ import { useState } from "react"
 import logo from "../../assets/white_king.svg"
 const Header = () => {
   const menuItem = "relative flex h-full items-center p-4 cursor-pointer font-bold text-white hover:bg-white/10 transition-colors ease-in-out"
+  const mobileItem= "relative flex h-full items-center p-4 cursor-pointer justify-center font-bold text-white hover:bg-white/10 transition-colors ease-in-out"
   const goGradient = "bg-gradient-to-r from-[#00ADD8] to-[#00A29C]"
   const logoText = "font-bold text-2xl text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
   const line = `h-1 w-8 my-1 rounded-full bg-white transition ease transform duration-300`
@@ -17,6 +18,7 @@ const Header = () => {
       </div>
 
       {/* mobile nav */}
+      {/* button && button animation */}
       <button className="md:hidden flex flex-col ml-auto pr-4 my-auto cursor-pointer"
         onClick={() => setIsOpen(!isOpen)}>
         <div
@@ -33,7 +35,19 @@ const Header = () => {
                   ? "-rotate-45 -translate-y-3 opacity-100"
                   : "opacity-100"
             }`}
-        />      </button>
+        />      
+        {/* submenu */}
+        <div className={`absolute top-16 ${goGradient} w-full left-0 ${
+            isOpen 
+              ? "block" 
+              : "hidden"
+        }`}>
+          <div className={`${mobileItem}`}>Home</div>
+          <div className={`${mobileItem}`}>Play</div>
+          <div className={`${mobileItem}`}>Learn</div>
+          <div className={`${mobileItem}`}>Sign in</div>
+        </div>
+      </button>
 
       {/* desktop nav */}
       <div className="hidden md:flex flex-1 items-center justify-end">
@@ -45,6 +59,5 @@ const Header = () => {
     </nav>
   ) 
 }
-
 
 export default Header
