@@ -1,0 +1,7 @@
+export const GoGradient = "bg-gradient-to-r from-[#00ADD8] to-[#00A29C]"
+export const GopherBlue = "#00ADD8"
+export const LightBlue = "#5DC9E2"
+export const Fuchsia = "#CE3262"
+export const Aqua = "#00A29C"
+export const Black = "#000000"
+export const Yellow = "#FDDD00"
