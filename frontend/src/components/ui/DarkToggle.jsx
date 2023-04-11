@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 const DarkToggle = () => {
   const btn = "bg-[#CE3262] hover:bg-[#BF2E5A] text-white font-bold py-2 px-4 rounded"
@@ -10,11 +10,11 @@ const DarkToggle = () => {
   }, [theme])
   const handleToggle = () => setTheme(theme === "dark" ? "light" : "dark")
   return (
-    <button 
+    <div
       className={`${btn}`}
       onClick={() => handleToggle()}>
       &#9728;&#65039;
-    </button>
+    </div>
   )
 
 }

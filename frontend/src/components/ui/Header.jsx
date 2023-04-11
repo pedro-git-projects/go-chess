@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 
 import logo from "../../assets/white_king.svg"
+import DarkToggle from "./DarkToggle"
 const Header = () => {
   const menuItem = "relative flex h-full items-center p-4 cursor-pointer font-bold text-white hover:bg-white/10 transition-colors ease-in-out"
   const mobileItem= "relative flex h-full items-center p-4 cursor-pointer justify-center font-bold text-white hover:bg-white/10 transition-colors ease-in-out"
@@ -55,6 +56,7 @@ const Header = () => {
           <Link to={`/signin`} className={`${mobileItem}`}>
             Sign in
           </Link>  
+          <DarkToggle/>
         </div>
       </button>
 
@@ -72,6 +74,7 @@ const Header = () => {
         <Link to={`/signin`} className={`${menuItem}`}>
           Sign in
         </Link>  
+        <DarkToggle/>
       </div>
     </nav>
   ) 
