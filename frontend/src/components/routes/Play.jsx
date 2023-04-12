@@ -1,4 +1,3 @@
-import DarkToggle from "../ui/DarkToggle"
 import { Layout } from "../ui/Layout"
 
 const Play = () => ( 
