@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+  .bg-color {
+    @apply bg-white dark:bg-[#344a53];
+  }
   h1 {
     @apply text-3xl dark:text-white;
   }
