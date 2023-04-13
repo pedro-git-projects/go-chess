@@ -3,9 +3,9 @@ package game
 import (
 	"fmt"
 
-	"github.com/pedro-git-projects/go-chess/src/board"
-	"github.com/pedro-git-projects/go-chess/src/piece"
-	"github.com/pedro-git-projects/go-chess/src/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/board"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/piece"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
 )
 
 type Game struct {
@@ -44,6 +44,12 @@ func (game *Game) MovePiece(from, to utils.Coordinate) {
 	if ok {
 		game.setCurrentTurn(p.Color())
 	}
+}
+
+func (game *Game) LegalMovements(c utils.Coordinate) []utils.Coordinate {
+	p := game.board.PieceAt(c)
+	p.CalculateLegalMoves(game.board)
+	return p.LegalMoves()
 }
 
 // PrintBoard prints the current board state to the os.Stdout

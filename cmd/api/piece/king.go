@@ -3,7 +3,7 @@ package piece
 import (
 	"fmt"
 
-	"github.com/pedro-git-projects/go-chess/src/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
 )
 
 // check iff king is in any piece list of legal moves

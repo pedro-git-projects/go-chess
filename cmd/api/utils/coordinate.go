@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"unicode"
@@ -37,4 +38,13 @@ func CoordFromStr(s string) (Coordinate, error) {
 
 func (c Coordinate) String() string {
 	return fmt.Sprintf("(%c, %d)", c.First, c.Second)
+}
+
+func (c Coordinate) MarshalJSON() ([]byte, error) {
+	str := fmt.Sprintf("%c%d", c.First, c.Second)
+	return json.Marshal(struct {
+		Coordinate string `json:"coordinate"`
+	}{
+		Coordinate: str,
+	})
 }

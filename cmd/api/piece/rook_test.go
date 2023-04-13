@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pedro-git-projects/go-chess/src/board"
-	"github.com/pedro-git-projects/go-chess/src/piece"
-	"github.com/pedro-git-projects/go-chess/src/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/board"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/piece"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
 )
 
 func TestRookCalculateLegalMoves(t *testing.T) {

@@ -3,7 +3,7 @@ package piece
 import (
 	"fmt"
 
-	"github.com/pedro-git-projects/go-chess/src/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
 )
 
 // the Pawn type represents pawn pieces in a game of chess
