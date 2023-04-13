@@ -1,4 +1,4 @@
-import {  useReducer } from "react";
+import {  useReducer } from "react"
 
 const reducer = (state, action) => {
   if (action.type === "toggle") {
@@ -13,16 +13,16 @@ const reducer = (state, action) => {
 }
 
 const DarkReducer = () => {
-  const btn = "bg-[#CE3262] hover:bg-[#BF2E5A] text-white font-bold py-2 px-4 rounded cursor-pointer"
+  const btn = "text-white font-bold py-2 px-4 rounded cursor-pointer"
   const [theme, dispatch] = useReducer(reducer, { isDark: false }) 
   return (
     <div
       className={`${btn}`}
       onClick={() => dispatch({type: "toggle"})}>
       { 
-          document.documentElement.classList.contains("dark")
-          ? <html>&#127774;</html> 
-          : <html>&#127769;</html> 
+        document.documentElement.classList.contains("dark")
+          ?  "Go back" 
+          :  "Go Dark" 
       } 
     </div>
   )

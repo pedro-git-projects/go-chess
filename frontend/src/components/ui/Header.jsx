@@ -2,8 +2,6 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 
 import logo from "../../assets/white_king.svg"
-import DarkToggle from "./DarkToggle"
-import DarkRef from "./DarkRef"
 import DarkReducer from "./DarkReducer"
 
 const Header = () => {
@@ -59,7 +57,7 @@ const Header = () => {
           <Link to={`/signin`} className={`${mobileItem}`}>
             Sign in
           </Link>  
-          <DarkReducer/>
+          <DarkReducer className={`${mobileItem}`}/>
         </div>
       </button>
 
