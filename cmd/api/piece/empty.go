@@ -1,6 +1,6 @@
 package piece
 
-import "github.com/pedro-git-projects/go-chess/src/utils"
+import "github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
 
 // Empty represents an empty space
 // it exists solely for the purpose of
