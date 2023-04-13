@@ -1,4 +1,17 @@
-import React, { useState } from 'react';
+import { useState } from "react"
+import whitePawn from "../../assets/white_pawn.svg"
+import blackPawn from "../../assets/black_pawn.svg"
+import whiteKnight from "../../assets/white_horse.svg"
+import blackKnight from "../../assets/black_horse.svg"
+import whiteBishop from "../../assets/white_bishop.svg"
+import blackBishop from "../../assets/black_bishop.svg"
+import whiteRook from "../../assets/white_rook.svg"
+import blackRook from "../../assets/black_rook.svg"
+import whiteQueen from "../../assets/white_queen.svg"
+import blackQueen from "../../assets/black_queen.svg"
+import whiteKing from "../../assets/white_king.svg"
+import blackKing from "../../assets/black_king.svg"
+
 
 const ChessBoard = ()  => {
   const [squares, setSquares] = useState([
@@ -47,23 +60,34 @@ const ChessBoard = ()  => {
 
   const getPieceSymbol = (piece) => {
     const type = piece.includes(':') ? piece.split(':')[1].split(' ')[1] : '';
+    const color = piece.includes(':') ? piece.split(':')[1].split(' ')[0] : '';
+    let svg;
     switch (type) {
       case 'pawn':
-        return '♙';
-      case 'rook':
-        return '♖';
+        svg = color === 'white' ? whitePawn : blackPawn;
+        break;
       case 'knight':
-        return '♘';
+        svg = color === 'white' ? whiteKnight : blackKnight;
+        break;
       case 'bishop':
-        return '♗';
+        svg = color === 'white' ? whiteBishop : blackBishop;
+        break;
+      case 'rook':
+        svg = color === 'white' ? whiteRook : blackRook;
+        break;
       case 'queen':
-        return '♕';
+        svg = color === 'white' ? whiteQueen : blackQueen;
+        break;
       case 'king':
-        return '♔';
+        svg = color === 'white' ? whiteKing : blackKing;
+        break;
       default:
-        return '';
+        return null;
     }
-  };
+
+    return <img src={svg} alt={type} />;
+  }
+
   const renderSquare = (file, rank, index) => {
     const squareColor = (file.charCodeAt(0) + rank) % 2 === 0 ? 'bg-gray-500' : 'bg-white';
     const piece = squares[index] || '';
@@ -90,7 +114,7 @@ const ChessBoard = ()  => {
   const ranks = [8, 7, 6, 5, 4, 3, 2, 1];
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
-      <div className="border border-gray-900 rounded-md overflow-hidden">
+      <div className="border border-gray-900 overflow-hidden">
         {ranks.map((rank) => renderRank(rank))}
       </div>
     </div>
