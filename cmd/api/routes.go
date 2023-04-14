@@ -10,6 +10,7 @@ import (
 func routes() http.Handler {
 	gameTable := game.NewTable()
 	router := httprouter.New()
+	router.GET("/room/new", newRoomHandler)
 	router.GET("/board/:clientID", boardHandler(gameTable))
 	router.POST("/move/:clientID", movePieceHandler(gameTable))
 	router.POST("/calc/:clientID", calculateLegalMovementsHanlder(gameTable))

@@ -15,6 +15,12 @@ type Coordinate struct {
 	Coordinate string `json:"coordinate"`
 }
 
+// newRoomHandler creates a new unique room uuid and returns it to the client
+func newRoomHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+	id := utils.GenerateRoomId()
+	fmt.Fprintf(w, `{"roomId": "%s"}`, id)
+}
+
 // boardHandler is a closure on a httprouter.Handle which
 // tries to fetch a game object from the table.
 // If it fails, a new entry is created using the clientID.
