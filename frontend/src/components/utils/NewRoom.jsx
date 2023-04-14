@@ -19,7 +19,7 @@ const NewRoom = () => {
     const { clientID } = await response.json();
 
     // Navigate to the new room's URL
-    navigate(`/rooms/${clientID}`);
+    navigate(`/room/${clientID}`);
     console.log(clientID)
   };
 
