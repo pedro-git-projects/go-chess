@@ -20,8 +20,6 @@ type Coordinate struct {
 // to the table. It also returns the ID to the client
 func newRoomHandler(table *game.Table) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-		table.Lock()
-		defer table.Unlock()
 		clientID := utils.GenerateRoomId()
 		gameState := game.New()
 		table.SetGame(clientID, gameState)

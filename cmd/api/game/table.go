@@ -28,11 +28,3 @@ func (t *Table) SetGame(clientID string, gameState *Game) {
 	defer t.mu.Unlock()
 	t.games[clientID] = gameState
 }
-
-func (t *Table) Lock() {
-	t.mu.Lock()
-}
-
-func (t *Table) Unlock() {
-	t.mu.Unlock()
-}
