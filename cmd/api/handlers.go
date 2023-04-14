@@ -15,10 +15,18 @@ type Coordinate struct {
 	Coordinate string `json:"coordinate"`
 }
 
-// newRoomHandler creates a new unique room uuid and returns it to the client
-func newRoomHandler(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
-	id := utils.GenerateRoomId()
-	fmt.Fprintf(w, `{"roomId": "%s"}`, id)
+// newRoomHandler creates a new unique room uuid
+// creates a new game state and adds them both
+// to the table. It also returns the ID to the client
+func newRoomHandler(table *game.Table) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		table.Lock()
+		defer table.Unlock()
+		clientID := utils.GenerateRoomId()
+		gameState := game.New()
+		table.SetGame(clientID, gameState)
+		fmt.Fprintf(w, `{"clientID": "%s"}`, clientID)
+	}
 }
 
 // boardHandler is a closure on a httprouter.Handle which
