@@ -15,17 +15,44 @@ type Coordinate struct {
 	Coordinate string `json:"coordinate"`
 }
 
-func boardHandler(game *game.Game) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
-		s := game.MarshalState()
+// newRoomHandler creates a new unique room uuid
+// creates a new game state and adds them both
+// to the table. It also returns the ID to the client
+func newRoomHandler(table *game.Table) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		clientID := utils.GenerateRoomId()
+		gameState := game.New()
+		table.SetGame(clientID, gameState)
+		fmt.Fprintf(w, `{"clientID": "%s"}`, clientID)
+	}
+}
+
+// boardHandler is a closure on a httprouter.Handle which
+// tries to fetch a game object from the table.
+// If it fails, a new entry is created using the clientID.
+func boardHandler(table *game.Table) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
+		clientID := p.ByName("clientID")
+		gameState := table.Game(clientID)
+		if gameState == nil {
+			gameState = game.New()
+			table.SetGame(clientID, gameState)
+		}
+		s := gameState.MarshalState()
 		fmt.Fprintln(w, s)
 	}
 }
 
-func calculateLegalMovementsHanlder(game *game.Game) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+func calculateLegalMovementsHanlder(table *game.Table) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		clientID := p.ByName("clientID")
+		gameState := table.Game(clientID)
+		if gameState == nil {
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 		var coord Coordinate
@@ -41,8 +68,7 @@ func calculateLegalMovementsHanlder(game *game.Game) httprouter.Handle {
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
-
-		l := game.LegalMovements(c)
+		l := gameState.LegalMovements(c)
 		jsonBytes, err := json.Marshal(l)
 		if err != nil {
 			fmt.Println("Error marshaling coordinates:", err)
@@ -52,10 +78,17 @@ func calculateLegalMovementsHanlder(game *game.Game) httprouter.Handle {
 	}
 }
 
-func movePieceHandler(game *game.Game) httprouter.Handle {
-	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+// TODO get final coordinate from request body
+func movePieceHandler(table *game.Table) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		if r.Method != http.MethodPost {
 			w.WriteHeader(http.StatusMethodNotAllowed)
+			return
+		}
+		clientID := p.ByName("clientID")
+		gameState := table.Game(clientID)
+		if gameState == nil {
+			w.WriteHeader(http.StatusNotFound)
 			return
 		}
 		var coord Coordinate
@@ -72,7 +105,7 @@ func movePieceHandler(game *game.Game) httprouter.Handle {
 			return
 		}
 
-		game.MovePiece(c, c)
+		gameState.MovePiece(c, c)
 		w.WriteHeader(http.StatusOK)
 	}
 }

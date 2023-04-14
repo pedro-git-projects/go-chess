@@ -8,10 +8,11 @@ import (
 )
 
 func routes() http.Handler {
-	gameState := game.New()
+	gameTable := game.NewTable()
 	router := httprouter.New()
-	router.GET("/board", boardHandler(gameState))
-	router.POST("/move", movePieceHandler(gameState))
-	router.POST("/calc", calculateLegalMovementsHanlder(gameState))
+	router.GET("/room/new", newRoomHandler(gameTable))
+	router.GET("/board/:clientID", boardHandler(gameTable))
+	router.POST("/move/:clientID", movePieceHandler(gameTable))
+	router.POST("/calc/:clientID", calculateLegalMovementsHanlder(gameTable))
 	return setContentType(enableCORS(router))
 }

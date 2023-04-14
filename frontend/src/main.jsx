@@ -4,6 +4,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Err from './components/routes/Err'
 import Learn from './components/routes/Learn'
 import Play from './components/routes/Play'
+import Room from './components/routes/Room'
 import Root from './components/routes/Root'
 import SignIn from './components/routes/Signin'
 import SignUp from './components/routes/Signup'
@@ -30,6 +31,10 @@ const router = createBrowserRouter([
   {
     path: "/signup",
     element: <SignUp/>, 
+  },
+  {
+    path: "/room/:clientID",
+    element: <Room/>,
   },
 ])
 
