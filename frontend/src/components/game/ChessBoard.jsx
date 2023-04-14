@@ -31,7 +31,7 @@ const getPieceSymbol = (piece) => {
   return <img src={svg} alt={type}/>
 }
 
-const renderSquare = (colIndex, rowIndex, boardState, setBoardState) => {
+const renderSquare = ({clientID}, colIndex, rowIndex, boardState, setBoardState) => {
   const coordinate = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
   const square = boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
@@ -39,7 +39,7 @@ const renderSquare = (colIndex, rowIndex, boardState, setBoardState) => {
 
   const handleClick = async () => {
     console.log(coordinate)
-    const response = await fetch('http://localhost:8080/calc', {
+    const response = await fetch(`http://localhost:8080/calc/${clientID}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -69,30 +69,30 @@ const renderSquare = (colIndex, rowIndex, boardState, setBoardState) => {
   )
 }
 
-const renderRow = (rowIndex, boardState, setBoardState) => (
+const renderRow = ({clientID}, rowIndex, boardState, setBoardState) => (
   <div key={`row${rowIndex}`} className="flex flex-row-reverse">
-    { Array.from(Array(8).keys()).map((colIndex) => renderSquare(colIndex, rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((colIndex) => renderSquare({clientID}, colIndex, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const renderBoard = (boardState, setBoardState) => (
+const renderBoard = ({clientID}, boardState, setBoardState) => (
   <div>
-    { Array.from(Array(8).keys()).map((rowIndex) => renderRow(rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({clientID},rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const ChessBoard = () => {
+const ChessBoard = ({clientID}) => {
   const [boardState, setBoardState] = useState([])
   useEffect(() => {
     async function fetchBoardState() {
-      const response = await fetch("http://localhost:8080/board")
+      const response = await fetch(`http://localhost:8080/board/${clientID}`)
       const data = await response.json()
       setBoardState(data)
     }
     fetchBoardState()
   }, [])
 
-  return renderBoard(boardState, setBoardState)
+  return renderBoard({clientID}, boardState, setBoardState)
 }
 
 export default ChessBoard

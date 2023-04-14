@@ -1,13 +1,16 @@
 import {useParams} from "react-router-dom"
+import ChessBoard from "../game/ChessBoard"
 import {Layout} from "../ui/Layout"
 
-// TODO use clientID to create game with 
-// the new multiple games funcitonality
 const Room = () => {
   const { clientID } = useParams()
   return (
     <Layout>
-      <h1>{clientID}</h1>
+      <div className="w-full h-full flex align-middle items-center justify-center">
+        <div className="mx-auto">
+          <ChessBoard clientID={clientID}></ChessBoard>
+        </div>
+      </div>
     </Layout>
   )
 }
