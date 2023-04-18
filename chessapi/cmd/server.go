@@ -60,7 +60,6 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 	if r.Message == "join" && s.table.HasKey(roomID) {
 		clientID := utils.GenerateRoomId()
 		gameState := s.table.Game(roomID)
-		fmt.Println(roomID)
 		// check if gameState has been correctly populated
 		if gameState == nil {
 			resp := JoinRoomResponse{

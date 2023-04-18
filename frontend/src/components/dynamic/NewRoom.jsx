@@ -6,7 +6,6 @@ import ConnectToWS from '../websockets/ConnectToWS'
 const NewRoom = () => {
   const navigate = useNavigate()
   const [response, setResponse] = useState("")
-  const [room, setRoom] = useState(null)
   const handleClick = async () => {
     try {
       const ws = await ConnectToWS("ws://localhost:8080/create-room")
