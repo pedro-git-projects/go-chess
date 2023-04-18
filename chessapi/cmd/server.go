@@ -19,7 +19,7 @@ func NewServer() *GameServer {
 	}
 }
 
-func (s *GameServer) receiveCreateRooms(ws *websocket.Conn) {
+func (s *GameServer) receiveCreateRoom(ws *websocket.Conn) {
 	msg := new(CreateRoomRequest)
 	err := websocket.JSON.Receive(ws, msg)
 	if err != nil {
@@ -40,6 +40,37 @@ func (s *GameServer) receiveCreateRooms(ws *websocket.Conn) {
 		}
 		err = websocket.JSON.Send(ws, resp)
 		if err != nil {
+			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+		}
+	}
+}
+
+// receiveJoinRoom expects to receive a JSON object containing
+// the message join and a roomID
+// if the roomID is in the game map and there is an empty slot
+// then the client joins that room
+func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
+	r := new(JoinRoomRequest)
+	err := websocket.JSON.Receive(ws, r)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
+	}
+	roomID := r.RoomID
+	if r.Message == "join" && s.table.HasKey(roomID) {
+		clientID := utils.GenerateRoomId()
+		err := s.table.Game(roomID).AddClient(game.NewClient(clientID))
+		gameState := s.table.Game(roomID)
+		if err == nil {
+			s.table.SetGame(roomID, gameState)
+			resp := JoinRoomResponse{
+				RoomID:   roomID,
+				ClientID: clientID,
+			}
+			err = websocket.JSON.Send(ws, resp)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+			}
+		} else {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
 	}
