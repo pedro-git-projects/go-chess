@@ -26,10 +26,10 @@ func (s *GameServer) receiveCreateRooms(ws *websocket.Conn) {
 		fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
 	}
 	if msg.Message == "create" {
-		clientID := utils.GenerateRoomId()
+		roomID := utils.GenerateRoomId()
 		gameState := game.New()
-		s.table.SetGame(clientID, gameState)
-		resp := CreateRoomResponse{ClientID: clientID}
+		s.table.SetGame(roomID, gameState)
+		resp := CreateRoomResponse{RoomID: roomID}
 		err := websocket.JSON.Send(ws, resp)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)

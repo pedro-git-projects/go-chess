@@ -6,21 +6,21 @@ import { useEffect } from "react"
 const Room = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const clientID = location.state?.clientID || ""
+  const roomID = location.state?.roomID || ""
   useEffect(() => {
-    if (!clientID) {
+    if (!roomID) {
       navigate("/play")
     }
-  }, [clientID, navigate])
+  }, [roomID, navigate])
 
-  if (!clientID) {
+  if (!roomID) {
     return null
   }
   return (
     <Layout>
       <div className="w-full h-full flex align-middle items-center justify-center">
         <div className="mx-auto">
-          <ChessBoard clientID={clientID}></ChessBoard>
+          <ChessBoard roomID={roomID}></ChessBoard>
         </div>
       </div>
     </Layout>

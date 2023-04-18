@@ -17,14 +17,14 @@ func NewTable() *Table {
 	}
 }
 
-func (t *Table) Game(clientID string) *Game {
+func (t *Table) Game(roomID string) *Game {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	return t.games[clientID]
+	return t.games[roomID]
 }
 
-func (t *Table) SetGame(clientID string, gameState *Game) {
+func (t *Table) SetGame(roomID string, gameState *Game) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
-	t.games[clientID] = gameState
+	t.games[roomID] = gameState
 }
