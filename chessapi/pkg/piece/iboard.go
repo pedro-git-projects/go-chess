@@ -1,6 +1,6 @@
 package piece
 
-import "github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+import "github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 
 // Interface to break dependency cycle
 type board interface {

@@ -7,8 +7,7 @@ import (
 
 func main() {
 	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: routes(),
+		Addr: ":8080",
 	}
 	fmt.Println("Starting server on port 8080")
 	srv.ListenAndServe()

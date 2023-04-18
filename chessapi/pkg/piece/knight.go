@@ -3,7 +3,7 @@ package piece
 import (
 	"fmt"
 
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 )
 
 // the Knight type represents the king piece in a game of chess

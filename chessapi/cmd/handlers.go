@@ -7,8 +7,8 @@ import (
 	"net/http"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/game"
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/game"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 )
 
 type Coordinate struct {

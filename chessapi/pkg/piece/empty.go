@@ -1,6 +1,6 @@
 package piece
 
-import "github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+import "github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 
 // Empty represents an empty space
 // it exists solely for the purpose of

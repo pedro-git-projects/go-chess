@@ -1,7 +1,7 @@
 // piece defines the piece interface and color enums
 package piece
 
-import "github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+import "github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 
 // Piece is an interface with the restrictions a chess piece
 // must satisfy

@@ -5,10 +5,10 @@ install:
 	$(eval LDFLAGS += "-w -s")
 	go mod tidy
 	cd ./frontend/ && npm install
-	cd ./cmd/api; go build -v -ldflags $(LDFLAGS) -o $(OBJ_NAME); mv $(OBJ_NAME) ../bin 
+	cd ./chessapi/cmd/; go build -v -ldflags $(LDFLAGS) -o $(OBJ_NAME); mv $(OBJ_NAME) ../bin 
 run:
 	$(eval OBJ_NAME += chess-engine)
-	./cmd/bin/$(OBJ_NAME)	
+	./chessapi/bin/$(OBJ_NAME)	
 dev:
 	cd ./frontend/; npm run dev
 doc:

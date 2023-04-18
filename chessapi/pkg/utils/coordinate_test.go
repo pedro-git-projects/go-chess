@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 )
 
 func TestCoordFromString(t *testing.T) {

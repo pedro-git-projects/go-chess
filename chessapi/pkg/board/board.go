@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/piece"
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/piece"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 )
 
 // Board represents the a chessboard

@@ -4,9 +4,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/board"
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/piece"
-	"github.com/pedro-git-projects/projeto-integrado-frontend/cmd/api/utils"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/board"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/piece"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 )
 
 func TestKingCalculateLegalMoves(t *testing.T) {
