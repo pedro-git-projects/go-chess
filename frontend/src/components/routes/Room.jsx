@@ -1,9 +1,21 @@
-import {useParams} from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import ChessBoard from "../game/ChessBoard"
-import {Layout} from "../ui/Layout"
+import { Layout } from "../ui/Layout"
+import { useEffect } from "react"
 
 const Room = () => {
-  const { clientID } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const clientID = location.state?.clientID || ""
+  useEffect(() => {
+    if (!clientID) {
+      navigate("/play")
+    }
+  }, [clientID, navigate])
+
+  if (!clientID) {
+    return null
+  }
   return (
     <Layout>
       <div className="w-full h-full flex align-middle items-center justify-center">
@@ -14,4 +26,6 @@ const Room = () => {
     </Layout>
   )
 }
+
 export default Room
+

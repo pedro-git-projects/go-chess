@@ -5,17 +5,16 @@ import ConnectToWS from '../websockets/ConnectToWS'
 
 const NewRoom = () => {
   const navigate = useNavigate()
-  const [message, setMessage] = useState("")
   const [response, setResponse] = useState("")
+  const [room, setRoom] = useState(null)
   const handleClick = async () => {
     try {
       const ws = await ConnectToWS("ws://localhost:8080/create-room")
       const message = JSON.stringify({message: "create"})
       const resp = await SendMessage(ws, message)
       setResponse(resp)
-      setMessage("")
       ws.close()
-      navigate(`/room/${resp.client_id}`);
+      navigate(`/room/${resp.client_id}`, { state: {clientID: resp.client_id}})    
     } catch(err) {
       console.log("Error: ", err)
     }
