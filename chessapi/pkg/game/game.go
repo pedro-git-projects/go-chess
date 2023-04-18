@@ -18,7 +18,7 @@ type Game struct {
 
 // New returns a pointer to a Game
 // the zero values are fully usable.
-func New() *Game {
+func NewGame() *Game {
 	return &Game{
 		board:       board.New(),
 		currentTurn: piece.White,

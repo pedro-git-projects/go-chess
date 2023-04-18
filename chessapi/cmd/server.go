@@ -28,7 +28,7 @@ func (s *GameServer) receiveCreateRoom(ws *websocket.Conn) {
 	if msg.Message == "create" {
 		roomID := utils.GenerateRoomId()
 		clientID := utils.GenerateRoomId()
-		gameState := game.New()
+		gameState := game.NewGame()
 		s.table.SetGame(roomID, gameState)
 		err := s.table.Game(roomID).AddClient(game.NewClient(clientID))
 		if err != nil {
@@ -50,6 +50,7 @@ func (s *GameServer) receiveCreateRoom(ws *websocket.Conn) {
 // if the roomID is in the game map and there is an empty slot
 // then the client joins that room
 func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
+	// receive request
 	r := new(JoinRoomRequest)
 	err := websocket.JSON.Receive(ws, r)
 	if err != nil {
@@ -58,19 +59,60 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 	roomID := r.RoomID
 	if r.Message == "join" && s.table.HasKey(roomID) {
 		clientID := utils.GenerateRoomId()
-		err := s.table.Game(roomID).AddClient(game.NewClient(clientID))
 		gameState := s.table.Game(roomID)
-		if err == nil {
-			s.table.SetGame(roomID, gameState)
+		fmt.Println(roomID)
+		// check if gameState has been correctly populated
+		if gameState == nil {
 			resp := JoinRoomResponse{
-				RoomID:   roomID,
-				ClientID: clientID,
+				RoomID:   "",
+				ClientID: "",
+				Error:    fmt.Sprintf("invalid room ID: %s", roomID),
 			}
 			err = websocket.JSON.Send(ws, resp)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 			}
-		} else {
+			return
+		}
+		err := gameState.AddClient(game.NewClient(clientID))
+		if err != nil {
+			resp := JoinRoomResponse{
+				RoomID:   "",
+				ClientID: "",
+				Error:    err.Error(),
+			}
+			err = websocket.JSON.Send(ws, resp)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+			}
+			return
+		}
+		s.table.SetGame(roomID, gameState)
+		resp := JoinRoomResponse{
+			RoomID:   roomID,
+			ClientID: clientID,
+			Error:    "",
+		}
+		err = websocket.JSON.Send(ws, resp)
+		if err != nil {
+			resp := JoinRoomResponse{
+				RoomID:   "",
+				ClientID: "",
+				Error:    err.Error(),
+			}
+			err = websocket.JSON.Send(ws, resp)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+			}
+		}
+	} else {
+		resp := JoinRoomResponse{
+			RoomID:   "",
+			ClientID: "",
+			Error:    fmt.Sprintf("invalid room ID: %s", roomID),
+		}
+		err = websocket.JSON.Send(ws, resp)
+		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
 	}
