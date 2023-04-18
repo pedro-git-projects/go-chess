@@ -15,11 +15,10 @@ const NewRoom = () => {
       setResponse(resp)
       setMessage("")
       ws.close()
+      navigate(`/room/${resp.client_id}`);
     } catch(err) {
       console.log("Error: ", err)
     }
-    console.log(resp)
-
   }
   return (
     <>
