@@ -5,5 +5,17 @@ type CreateRoomRequest struct {
 }
 
 type CreateRoomResponse struct {
-	RoomID string `json:"room_id"`
+	RoomID   string `json:"room_id"`
+	ClientID string `json:"client_id"`
+}
+
+type JoinRoomRequest struct {
+	Message string `json:"message"`
+	RoomID  string `json:"room_id"`
+}
+
+type JoinRoomResponse struct {
+	RoomID   string `json:"room_id"`
+	ClientID string `json:"client_id"`
+	Error    string `json:"error"`
 }

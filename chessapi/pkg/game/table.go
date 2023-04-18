@@ -28,3 +28,8 @@ func (t *Table) SetGame(roomID string, gameState *Game) {
 	defer t.mu.Unlock()
 	t.games[roomID] = gameState
 }
+
+func (t *Table) HasKey(roomID string) bool {
+	_, ok := t.games[roomID]
+	return ok
+}
