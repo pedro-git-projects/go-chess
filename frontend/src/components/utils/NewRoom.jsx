@@ -14,6 +14,7 @@ const NewRoom = () => {
       const resp = await SendMessage(ws, message)
       setResponse(resp)
       ws.close()
+      console.log("clientID: ", resp.client_id)
       navigate(`/room/${resp.room_id}`, { state: {roomID: resp.room_id}})    
     } catch(err) {
       console.log("Error: ", err)

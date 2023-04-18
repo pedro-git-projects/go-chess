@@ -5,5 +5,6 @@ type CreateRoomRequest struct {
 }
 
 type CreateRoomResponse struct {
-	RoomID string `json:"room_id"`
+	RoomID   string `json:"room_id"`
+	ClientID string `json:"client_id"`
 }
