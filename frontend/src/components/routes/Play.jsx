@@ -1,5 +1,5 @@
 import { Layout } from "../ui/Layout"
-import NewRoom from "../utils/NewRoom"
+import NewRoom from "../dynamic/NewRoom"
 
 const Play = () => ( 
   <Layout>    
