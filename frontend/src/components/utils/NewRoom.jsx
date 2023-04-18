@@ -1,28 +1,24 @@
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import SendMessage from '../websockets/SendMessage'
+import ConnectToWS from '../websockets/ConnectToWS'
 
 const NewRoom = () => {
   const navigate = useNavigate()
-
+  const [response, setResponse] = useState("")
+  const [room, setRoom] = useState(null)
   const handleClick = async () => {
-    // Send a GET request to create a new room with the given name
-    const response = await fetch(`http://localhost:8080/room/new`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-    });
-
-    if (!response.ok) {
-      // Handle error response
-      console.error(`Failed to create room: ${response.statusText}`);
-      return;
+    try {
+      const ws = await ConnectToWS("ws://localhost:8080/create-room")
+      const message = JSON.stringify({message: "create"})
+      const resp = await SendMessage(ws, message)
+      setResponse(resp)
+      ws.close()
+      navigate(`/room/${resp.room_id}`, { state: {roomID: resp.room_id}})    
+    } catch(err) {
+      console.log("Error: ", err)
     }
-
-    const { clientID } = await response.json();
-
-    // Navigate to the new room's URL
-    navigate(`/room/${clientID}`);
-    console.log(clientID)
-  };
-
+  }
   return (
     <>
       <button type="button" onClick={handleClick}>Create room</button>
