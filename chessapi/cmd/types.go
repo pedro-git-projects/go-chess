@@ -29,3 +29,14 @@ type RenderBoardResponse struct {
 	GameState string `json:"state"`
 	Error     string `json:"error"`
 }
+
+type CalculateLegalMovementsRequest struct {
+	Message    string `json:"message"`
+	Coodrinate string `json:"coordinate"`
+	RoomID     string `json:"room_id"`
+}
+
+type CalculateLegalMovementsResponse struct {
+	LegalMovements string `json:"legal_movements"`
+	Error          string `json:"error"`
+}

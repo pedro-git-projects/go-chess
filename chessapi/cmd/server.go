@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/game"
 	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
@@ -10,12 +11,15 @@ import (
 )
 
 type GameServer struct {
-	table *game.Table
+	table         *game.Table
+	clientsInRoom map[string]map[string]*websocket.Conn // roomID -> clientID -> ws
+	mu            sync.Mutex
 }
 
 func NewServer() *GameServer {
 	return &GameServer{
-		table: game.NewTable(),
+		table:         game.NewTable(),
+		clientsInRoom: make(map[string]map[string]*websocket.Conn),
 	}
 }
 
@@ -30,10 +34,13 @@ func (s *GameServer) receiveCreateRoom(ws *websocket.Conn) {
 		clientID := utils.GenerateRoomId()
 		gameState := game.NewGame()
 		s.table.SetGame(roomID, gameState)
+		// try to add client to game
 		err := s.table.Game(roomID).AddClient(game.NewClient(clientID))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
+		// add client to room
+		s.addClientToRoom(roomID, clientID, ws)
 		resp := CreateRoomResponse{
 			RoomID:   roomID,
 			ClientID: clientID,
@@ -73,6 +80,7 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 			}
 			return
 		}
+		// try to add client to game
 		err := gameState.AddClient(game.NewClient(clientID))
 		if err != nil {
 			resp := JoinRoomResponse{
@@ -86,6 +94,8 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 			}
 			return
 		}
+		// add client to room
+		s.addClientToRoom(roomID, clientID, ws)
 		s.table.SetGame(roomID, gameState)
 		resp := JoinRoomResponse{
 			RoomID:   roomID,
@@ -132,7 +142,7 @@ func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
 	if r.Message != "render" || !s.table.HasKey(roomID) {
 		res := RenderBoardResponse{
 			GameState: "",
-			Error:     fmt.Sprintf("Could not render board: %s", err.Error()),
+			Error:     fmt.Sprintf("Could not render board, invalid data"),
 		}
 		err = websocket.JSON.Send(ws, res)
 		if err != nil {
@@ -146,9 +156,9 @@ func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
 			GameState: "",
 			Error:     fmt.Sprintf("Could not render board: invalid game state"),
 		}
-		err = websocket.JSON.Send(ws, res)
+		err := s.broadcastMessage(res, roomID)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
+			fmt.Fprintf(os.Stderr, "error broadcasting message: %s\n", err)
 		}
 		return
 	}
@@ -160,5 +170,42 @@ func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
 	err = websocket.JSON.Send(ws, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
+	}
+}
+
+// broadcastMessage sends a message to all clients in a room
+func (s *GameServer) broadcastMessage(msg interface{}, roomID string) error {
+	if clients, ok := s.clientsInRoom[roomID]; ok {
+		for _, conn := range clients {
+			if err := websocket.JSON.Send(conn, msg); err != nil {
+				return fmt.Errorf("error sending message: %s", err)
+			}
+		}
+		return nil
+	}
+	return fmt.Errorf("invalid room ID: %s", roomID)
+}
+
+// addClientToRoom is a concurrent safe method for adding clients to a room
+func (s *GameServer) addClientToRoom(roomID, clientID string, conn *websocket.Conn) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.clientsInRoom[roomID]; !ok {
+		s.clientsInRoom[roomID] = make(map[string]*websocket.Conn)
+	}
+	s.clientsInRoom[roomID][clientID] = conn
+}
+
+// removeClientFromRoom is a concurrent safe method for removing clients from a room
+func (s *GameServer) removeClientFromRoom(roomID, clientID string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.clientsInRoom[roomID]; ok {
+		delete(s.clientsInRoom[roomID], clientID)
+		if len(s.clientsInRoom[roomID]) == 0 {
+			delete(s.clientsInRoom, roomID)
+		}
 	}
 }
