@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -170,6 +172,55 @@ func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
 	err = websocket.JSON.Send(ws, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
+	}
+}
+
+// receiveCalculateLegalMovements expects JSON objects
+// of type {"message":"calc", "coordinate":"a1", "roomID":"id"}
+// in case they're received a message is broadcasted to the room
+// of type {"legal_movements":"[{"a4", "a3"}, "error":""]"}
+func (s *GameServer) receiveCalculateLegalMovements(ws *websocket.Conn) {
+	for {
+		r := new(CalculateRequest)
+		err := websocket.JSON.Receive(ws, r)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
+			return
+		}
+		if r.Coodrinate != "" && r.Message == "calc" && s.table.HasKey(r.RoomID) {
+			c, err := utils.CoordFromStr(r.Coodrinate)
+			if err != nil {
+				log.Println("Error converting object to coordinate:", err)
+				return
+			}
+			gameState := s.table.Game(r.RoomID)
+			if gameState == nil {
+				res := CalculateResponse{
+					LegalMovements: "",
+					Error:          fmt.Sprintf("Invalid game state"),
+				}
+				err := websocket.JSON.Send(ws, res)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+				}
+				return
+			}
+			color := gameState.PieceColor(c)
+			l := gameState.LegalMovements(c, color)
+			marshaled, err := json.Marshal(l)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error unmarshalling response: %s\n", err)
+			}
+			res := CalculateResponse{
+				LegalMovements: string(marshaled),
+				Error:          "",
+			}
+			err = s.broadcastMessage(res, r.RoomID)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+				return
+			}
+		}
 	}
 }
 

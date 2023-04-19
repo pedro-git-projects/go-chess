@@ -13,3 +13,7 @@ func NewClient(clientID string) *Client {
 		color: piece.None,
 	}
 }
+
+func (c *Client) Color() piece.Color {
+	return c.color
+}

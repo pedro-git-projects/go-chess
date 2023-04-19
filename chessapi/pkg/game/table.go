@@ -8,7 +8,7 @@ import (
 // of games and clientIDs
 type Table struct {
 	mu    sync.Mutex
-	games map[string]*Game
+	games map[string]*Game // Client -> *Game
 }
 
 func NewTable() *Table {

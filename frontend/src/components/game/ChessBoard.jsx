@@ -41,23 +41,18 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
 
   const handleClick = async () => {
     console.log(coordinate)
-    const response = await fetch(`http://localhost:8080/calc/${roomID}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ coordinate })
-    })
+    const ws = await ConnectToWS("ws://localhost:8080/calc")
+    console.log("WebSocket connection established.")
+    const msg = JSON.stringify({message:"calc",coordinate: coordinate, room_id:roomID})
+    const resp = await SendMessage(ws, msg)
+    console.log("response received:", resp)      
+    setBoardState(boardState.map((square) => {
+      if (JSON.parse(resp.legal_movements).some((d) => d.coordinate === square.coordinate)) {          
+        return { ...square, highlighted: true }
+      }
+      return { ...square, highlighted: false }
+    }))
 
-    if (response.ok) {
-      const data = await response.json()
-      setBoardState(boardState.map((square) => {
-        if (data.some((d) => d.coordinate === square.coordinate)) {
-          return { ...square, highlighted: true }
-        }
-        return { ...square, highlighted: false }
-      }))
-    }
   }
 
   return (

@@ -30,13 +30,13 @@ type RenderBoardResponse struct {
 	Error     string `json:"error"`
 }
 
-type CalculateLegalMovementsRequest struct {
+type CalculateRequest struct {
 	Message    string `json:"message"`
 	Coodrinate string `json:"coordinate"`
 	RoomID     string `json:"room_id"`
 }
 
-type CalculateLegalMovementsResponse struct {
+type CalculateResponse struct {
 	LegalMovements string `json:"legal_movements"`
 	Error          string `json:"error"`
 }
