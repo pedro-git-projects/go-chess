@@ -19,3 +19,13 @@ type JoinRoomResponse struct {
 	ClientID string `json:"client_id"`
 	Error    string `json:"error"`
 }
+
+type RenderBoardRequest struct {
+	Message string `json:"message"`
+	RoomID  string `json:"room_id"`
+}
+
+type RenderBoardResponse struct {
+	GameState string `json:"state"`
+	Error     string `json:"error"`
+}

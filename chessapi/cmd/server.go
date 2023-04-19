@@ -116,3 +116,49 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 		}
 	}
 }
+
+// receiveRenderBoard expects a {"message":"render", "room_id":"id"}
+// JSON object, if it is recived
+// it checks if the roomID is on the game table
+// and if it is, it responds with {"state":"[...]", and "error":"error"}
+func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
+	r := new(RenderBoardRequest)
+	err := websocket.JSON.Receive(ws, r)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "render::error 1 receiving message: %s\n", err)
+		return
+	}
+	roomID := r.RoomID
+	if r.Message != "render" || !s.table.HasKey(roomID) {
+		res := RenderBoardResponse{
+			GameState: "",
+			Error:     fmt.Sprintf("Could not render board: %s", err.Error()),
+		}
+		err = websocket.JSON.Send(ws, res)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
+		}
+		return
+	}
+	gameState := s.table.Game(roomID)
+	if gameState == nil {
+		res := RenderBoardResponse{
+			GameState: "",
+			Error:     fmt.Sprintf("Could not render board: invalid game state"),
+		}
+		err = websocket.JSON.Send(ws, res)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
+		}
+		return
+	}
+	m := gameState.MarshalState()
+	resp := RenderBoardResponse{
+		GameState: m,
+		Error:     "",
+	}
+	err = websocket.JSON.Send(ws, resp)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
+	}
+}

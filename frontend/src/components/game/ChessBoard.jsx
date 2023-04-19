@@ -11,6 +11,8 @@ import whiteQueen from "../../assets/white_queen.svg"
 import blackQueen from "../../assets/black_queen.svg"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
+import ConnectToWS from "../websockets/ConnectToWS"
+import SendMessage from "../websockets/SendMessage"
 
 const getPieceSymbol = (piece) => {
   const [color, type] = piece.split(" ")
@@ -85,9 +87,12 @@ const ChessBoard = ({roomID}) => {
   const [boardState, setBoardState] = useState([])
   useEffect(() => {
     async function fetchBoardState() {
-      const response = await fetch(`http://localhost:8080/board/${roomID}`)
-      const data = await response.json()
-      setBoardState(data)
+      const ws = await ConnectToWS(`ws://localhost:8080/board`)
+      console.log("WebSocket connection established.")
+      const msg = JSON.stringify({message:"render", room_id:roomID})
+      const resp = await SendMessage(ws, msg)
+      console.log("response received:", resp)
+      setBoardState(JSON.parse(resp.state))
     }
     fetchBoardState()
   }, [])
