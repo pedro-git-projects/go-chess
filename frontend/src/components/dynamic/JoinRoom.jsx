@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import ConnectToWS from "../websockets/ConnectToWS"
-import SendMessage from "../websockets/SendMessage"
+import connectToWS from "../../hooks/connectToWS"
+import sendMessage from "../../hooks/sendMessage"
 
 const JoinRoom = () => {
   const navigate = useNavigate()
@@ -12,10 +12,10 @@ const JoinRoom = () => {
   const handleJoinRoom = async (e) => {
     e.preventDefault()
     try {
-      const ws = await ConnectToWS("ws://localhost:8080/join-room")
+      const ws = await connectToWS("ws://localhost:8080/join-room")
       console.log("WebSocket connection established.")
       const message = JSON.stringify({message: "join", room_id: roomCode})    
-      const resp = await SendMessage(ws, message)
+      const resp = await sendMessage(ws, message)
       console.log("response received:", resp)
       setResponse(resp)
       if (resp.room_id === "") {

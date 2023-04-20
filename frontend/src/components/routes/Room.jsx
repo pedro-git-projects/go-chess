@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router-dom"
 import ChessBoard from "../game/ChessBoard"
 import { Layout } from "../ui/Layout"
 import { useState,useEffect } from "react"
-import ConnectToWS from "../websockets/ConnectToWS"
+import connectToWS from "../../hooks/connectToWS"
 
 const Room = () => {
   const location = useLocation()
@@ -16,8 +16,8 @@ const Room = () => {
 
   const [ws, setWs] = useState(null);
   useEffect(() => {
-    async function connectToWebSocket() {
-      const websocket = await ConnectToWS("ws://localhost:8080/board");
+    const connectToWebSocket = async () => {
+      const websocket = await connectToWS("ws://localhost:8080/board");
       setWs(websocket);
     }
     connectToWebSocket();

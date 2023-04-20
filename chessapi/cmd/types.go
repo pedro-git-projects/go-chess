@@ -40,3 +40,12 @@ type CalculateResponse struct {
 	LegalMovements string `json:"legal_movements"`
 	Error          string `json:"error"`
 }
+
+// Coodrinate is a pointer to string so it can be
+// optional, being ommited when empty instead of receiving
+// the zero value of the string type, namely ""
+type BoardRequest struct {
+	Message    string  `json:"message"`
+	RoomID     string  `json:"room_id"`
+	Coordinate *string `json:"coordinate,omitempty"`
+}

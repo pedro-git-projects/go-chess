@@ -129,6 +129,89 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 	}
 }
 
+func (s *GameServer) receiveBoard(ws *websocket.Conn) {
+	for {
+		r := new(BoardRequest)
+		err := websocket.JSON.Receive(ws, r)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "board::error 1 receiving message: %s\n", err)
+			return
+		}
+
+		switch r.Message {
+		case "render":
+			roomID := r.RoomID
+			if r.Message != "render" || !s.table.HasKey(roomID) {
+				res := RenderBoardResponse{
+					GameState: "",
+					Error:     fmt.Sprintf("Could not render board, invalid data"),
+				}
+				err = websocket.JSON.Send(ws, res)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
+				}
+				return
+			}
+			gameState := s.table.Game(roomID)
+			if gameState == nil {
+				res := RenderBoardResponse{
+					GameState: "",
+					Error:     fmt.Sprintf("Could not render board: invalid game state"),
+				}
+				err := s.broadcastMessage(res, roomID)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error broadcasting message: %s\n", err)
+				}
+				return
+			}
+			m := gameState.MarshalState()
+			resp := RenderBoardResponse{
+				GameState: m,
+				Error:     "",
+			}
+			err = websocket.JSON.Send(ws, resp)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
+			}
+		case "calc":
+			if *r.Coordinate != "" && r.Message == "calc" && s.table.HasKey(r.RoomID) {
+				c, err := utils.CoordFromStr(*r.Coordinate)
+				if err != nil {
+					log.Println("Error converting object to coordinate:", err)
+					return
+				}
+				gameState := s.table.Game(r.RoomID)
+				if gameState == nil {
+					res := CalculateResponse{
+						LegalMovements: "",
+						Error:          fmt.Sprintf("Invalid game state"),
+					}
+					err := websocket.JSON.Send(ws, res)
+					if err != nil {
+						fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+					}
+					return
+				}
+				color := gameState.PieceColor(c)
+				l := gameState.LegalMovements(c, color)
+				marshaled, err := json.Marshal(l)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error unmarshalling response: %s\n", err)
+				}
+				res := CalculateResponse{
+					LegalMovements: string(marshaled),
+					Error:          "",
+				}
+				err = s.broadcastMessage(res, r.RoomID)
+				if err != nil {
+					fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+					return
+				}
+			}
+		}
+	}
+}
+
 // receiveRenderBoard expects a {"message":"render", "room_id":"id"}
 // JSON object, if it is recived
 // it checks if the roomID is on the game table

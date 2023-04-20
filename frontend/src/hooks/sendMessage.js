@@ -1,4 +1,4 @@
-const SendMessage = (ws, message) => 
+const sendMessage = (ws, message) => 
   new Promise((resolve, reject) => {
     if (ws.readyState === WebSocket.OPEN) {
       ws.onmessage = (e) => {
@@ -14,4 +14,4 @@ const SendMessage = (ws, message) =>
   })
 
 
-export default SendMessage
+export default sendMessage
