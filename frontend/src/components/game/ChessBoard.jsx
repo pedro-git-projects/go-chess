@@ -33,7 +33,7 @@ const getPieceSymbol = (piece) => {
   return <img src={svg} alt={type}/>
 }
 
-const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) => {
+const renderSquare = ({roomID}, {ws}, colIndex, rowIndex, boardState, setBoardState) => {
   const coordinate = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
   const square = boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
@@ -41,7 +41,6 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
 
   const handleClick = async () => {
     console.log(coordinate)
-    const ws = await ConnectToWS("ws://localhost:8080/calc")
     console.log("WebSocket connection established.")
     const msg = JSON.stringify({message:"calc",coordinate: coordinate, room_id:roomID})
     const resp = await SendMessage(ws, msg)
@@ -66,23 +65,22 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
   )
 }
 
-const renderRow = ({roomID}, rowIndex, boardState, setBoardState) => (
+const renderRow = ({roomID}, {ws}, rowIndex, boardState, setBoardState) => (
   <div key={`row${rowIndex}`} className="flex flex-row-reverse">
-    { Array.from(Array(8).keys()).map((colIndex) => renderSquare({roomID}, colIndex, rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((colIndex) => renderSquare({roomID}, {ws}, colIndex, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const renderBoard = ({roomID}, boardState, setBoardState) => (
+const renderBoard = ({roomID}, {ws}, boardState, setBoardState) => (
   <div>
-    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID},rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID}, {ws}, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const ChessBoard = ({roomID}) => {
+const ChessBoard = ({roomID, ws}) => {
   const [boardState, setBoardState] = useState([])
   useEffect(() => {
     async function fetchBoardState() {
-      const ws = await ConnectToWS(`ws://localhost:8080/board`)
       console.log("WebSocket connection established.")
       const msg = JSON.stringify({message:"render", room_id:roomID})
       const resp = await SendMessage(ws, msg)
@@ -92,7 +90,7 @@ const ChessBoard = ({roomID}) => {
     fetchBoardState()
   }, [])
 
-  return renderBoard({roomID}, boardState, setBoardState)
+  return renderBoard({roomID}, {ws}, boardState, setBoardState)
 }
 
 export default ChessBoard
