@@ -17,12 +17,12 @@ const Room = () => {
   const [ws, setWs] = useState(null);
   useEffect(() => {
     const connectToWebSocket = async () => {
-      const websocket = await connectToWS("ws://localhost:8080/board");
-      setWs(websocket);
+      // console.log("CALLED") ok, it is being called only once
+      const websocket = await connectToWS("ws://localhost:8080/board")
+      setWs(websocket)
     }
-    connectToWebSocket();
-  }, []);
-
+    connectToWebSocket()
+  }, [])
   if (!roomID || !ws) {
     return null
   }
