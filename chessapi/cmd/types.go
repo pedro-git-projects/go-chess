@@ -47,5 +47,6 @@ type CalculateResponse struct {
 type BoardRequest struct {
 	Message    string  `json:"message"`
 	RoomID     string  `json:"room_id"`
+	ClientID   string  `json:"client_id"`
 	Coordinate *string `json:"coordinate,omitempty"`
 }

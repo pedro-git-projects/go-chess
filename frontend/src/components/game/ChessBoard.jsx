@@ -74,12 +74,12 @@ const renderBoard = ({roomID}, {ws}, boardState, setBoardState) => (
   </div>
 )
 
-const ChessBoard = ({roomID, ws}) => {
+const ChessBoard = ({roomID, ws, clientID}) => {
   const [boardState, setBoardState] = useState([])
   useEffect(() => {
     const fetchBoardState = async () => {
       console.log("WebSocket connection established.")
-      const msg = JSON.stringify({message:"render", room_id:roomID})
+      const msg = JSON.stringify({message:"render", room_id:roomID, clientID:clientID})
       const resp = await sendMessage(ws, msg)
       console.log("response received:", resp)
       setBoardState(JSON.parse(resp.state))

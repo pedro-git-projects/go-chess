@@ -8,6 +8,7 @@ const Room = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const roomID = location.state?.roomID || ""
+  const clientID = location.state?.clientID || ""
   useEffect(() => {
     if (!roomID) {
       navigate("/play")
@@ -30,7 +31,7 @@ const Room = () => {
     <Layout>
       <div className="w-full h-full flex align-middle items-center justify-center">
         <div className="mx-auto">
-          <ChessBoard roomID={roomID} ws={ws}></ChessBoard>
+          <ChessBoard roomID={roomID} ws={ws} clientID={clientID}></ChessBoard>
         </div>
       </div>
     </Layout>

@@ -14,7 +14,7 @@ const NewRoom = () => {
       setResponse(resp)
       ws.close()
       console.log("clientID: ", resp.client_id)
-      navigate(`/room/${resp.room_id}`, { state: {roomID: resp.room_id}})    
+      navigate(`/room/${resp.room_id}`, { state: { roomID: resp.room_id, clientID: resp.client_id }})    
     } catch(err) {
       console.log("Error: ", err)
     }

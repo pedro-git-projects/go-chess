@@ -15,7 +15,7 @@ import (
 type GameServer struct {
 	table         *game.Table
 	clientsInRoom map[string]map[string]*websocket.Conn // roomID -> clientID -> ws
-	mu            sync.Mutex
+	mu            sync.RWMutex
 }
 
 func NewServer() *GameServer {
@@ -34,6 +34,7 @@ func (s *GameServer) receiveCreateRoom(ws *websocket.Conn) {
 	if msg.Message == "create" {
 		roomID := utils.GenerateRoomId()
 		clientID := utils.GenerateRoomId()
+		fmt.Printf("Client ID: %s\n", clientID)
 		gameState := game.NewGame()
 		s.table.SetGame(roomID, gameState)
 		// try to add client to game
@@ -129,107 +130,53 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 	}
 }
 
-func (s *GameServer) receiveBoard(ws *websocket.Conn) {
-	for {
-		r := new(BoardRequest)
-		err := websocket.JSON.Receive(ws, r)
+func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardRequest) {
+	roomID := r.RoomID
+	if r.Coordinate != nil && r.Message == "calc" && s.table.HasKey(roomID) {
+		c, err := utils.CoordFromStr(*r.Coordinate)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "board::error 1 receiving message: %s\n", err)
+			log.Println("Error converting object to coordinate:", err)
 			return
 		}
-
-		switch r.Message {
-		case "render":
-			roomID := r.RoomID
-			if r.Message != "render" || !s.table.HasKey(roomID) {
-				res := RenderBoardResponse{
-					GameState: "",
-					Error:     fmt.Sprintf("Could not render board, invalid data"),
-				}
-				err = websocket.JSON.Send(ws, res)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
-				}
-				return
+		gameState := s.table.Game(roomID)
+		if gameState == nil {
+			res := CalculateResponse{
+				LegalMovements: "",
+				Error:          fmt.Sprintf("Invalid game state"),
 			}
-			gameState := s.table.Game(roomID)
-			if gameState == nil {
-				res := RenderBoardResponse{
-					GameState: "",
-					Error:     fmt.Sprintf("Could not render board: invalid game state"),
-				}
-				err := s.broadcastMessage(res, roomID)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error broadcasting message: %s\n", err)
-				}
-				return
-			}
-			m := gameState.MarshalState()
-			resp := RenderBoardResponse{
-				GameState: m,
-				Error:     "",
-			}
-			err = websocket.JSON.Send(ws, resp)
+			err := websocket.JSON.Send(ws, res)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
+				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 			}
-		case "calc":
-			if *r.Coordinate != "" && r.Message == "calc" && s.table.HasKey(r.RoomID) {
-				c, err := utils.CoordFromStr(*r.Coordinate)
-				if err != nil {
-					log.Println("Error converting object to coordinate:", err)
-					return
-				}
-				gameState := s.table.Game(r.RoomID)
-				if gameState == nil {
-					res := CalculateResponse{
-						LegalMovements: "",
-						Error:          fmt.Sprintf("Invalid game state"),
-					}
-					err := websocket.JSON.Send(ws, res)
-					if err != nil {
-						fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-					}
-					return
-				}
-				color := gameState.PieceColor(c)
-				l := gameState.LegalMovements(c, color)
-				marshaled, err := json.Marshal(l)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error unmarshalling response: %s\n", err)
-				}
-				res := CalculateResponse{
-					LegalMovements: string(marshaled),
-					Error:          "",
-				}
-				err = s.broadcastMessage(res, r.RoomID)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-					return
-				}
-			}
+			return
+		}
+		color := gameState.PieceColor(c)
+		l := gameState.LegalMovements(c, color)
+		marshaled, err := json.Marshal(l)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error unmarshalling response: %s\n", err)
+		}
+		res := CalculateResponse{
+			LegalMovements: string(marshaled),
+			Error:          "",
+		}
+		//	err = s.broadcastMessageInRoom(roomID, res) // Error origin
+		err = websocket.JSON.Send(ws, res)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+			return
 		}
 	}
 }
 
-// receiveRenderBoard expects a {"message":"render", "room_id":"id"}
-// JSON object, if it is recived
-// it checks if the roomID is on the game table
-// and if it is, it responds with {"state":"[...]", and "error":"error"}
-func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
-	r := new(RenderBoardRequest)
-	err := websocket.JSON.Receive(ws, r)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "render::error 1 receiving message: %s\n", err)
-		return
-	}
+func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 	roomID := r.RoomID
 	if r.Message != "render" || !s.table.HasKey(roomID) {
 		res := RenderBoardResponse{
 			GameState: "",
 			Error:     fmt.Sprintf("Could not render board, invalid data"),
 		}
-		err = websocket.JSON.Send(ws, res)
+		err := websocket.JSON.Send(ws, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
 		}
@@ -241,7 +188,7 @@ func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
 			GameState: "",
 			Error:     fmt.Sprintf("Could not render board: invalid game state"),
 		}
-		err := s.broadcastMessage(res, roomID)
+		err := s.broadcastMessageInRoom(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error broadcasting message: %s\n", err)
 		}
@@ -252,75 +199,56 @@ func (s *GameServer) receiveRenderBoard(ws *websocket.Conn) {
 		GameState: m,
 		Error:     "",
 	}
-	err = websocket.JSON.Send(ws, resp)
+	err := websocket.JSON.Send(ws, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
 	}
 }
 
-// receiveCalculateLegalMovements expects JSON objects
-// of type {"message":"calc", "coordinate":"a1", "roomID":"id"}
-// in case they're received a message is broadcasted to the room
-// of type {"legal_movements":"[{"a4", "a3"}, "error":""]"}
-func (s *GameServer) receiveCalculateLegalMovements(ws *websocket.Conn) {
+func (s *GameServer) receiveBoard(ws *websocket.Conn) {
 	for {
-		r := new(CalculateRequest)
+		r := new(BoardRequest)
 		err := websocket.JSON.Receive(ws, r)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
+			fmt.Fprintf(os.Stderr, "board::error 1 receiving message: %s\n", err)
 			return
 		}
-		if r.Coodrinate != "" && r.Message == "calc" && s.table.HasKey(r.RoomID) {
-			c, err := utils.CoordFromStr(r.Coodrinate)
-			if err != nil {
-				log.Println("Error converting object to coordinate:", err)
-				return
-			}
-			gameState := s.table.Game(r.RoomID)
-			if gameState == nil {
-				res := CalculateResponse{
-					LegalMovements: "",
-					Error:          fmt.Sprintf("Invalid game state"),
-				}
-				err := websocket.JSON.Send(ws, res)
-				if err != nil {
-					fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-				}
-				return
-			}
-			color := gameState.PieceColor(c)
-			l := gameState.LegalMovements(c, color)
-			marshaled, err := json.Marshal(l)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error unmarshalling response: %s\n", err)
-			}
-			res := CalculateResponse{
-				LegalMovements: string(marshaled),
-				Error:          "",
-			}
-			err = s.broadcastMessage(res, r.RoomID)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-				return
-			}
+		switch r.Message {
+		case "render":
+			s.handleRender(ws, r)
+		case "calc":
+			s.handleCalculateLegalMoves(ws, r)
 		}
 	}
 }
 
 // broadcastMessage sends a message to all clients in a room
-func (s *GameServer) broadcastMessage(msg interface{}, roomID string) error {
-	if clients, ok := s.clientsInRoom[roomID]; ok {
-		for _, conn := range clients {
-			if err := websocket.JSON.Send(conn, msg); err != nil {
-				return fmt.Errorf("error sending message: %s", err)
-			}
+// is the error
+func (s *GameServer) broadcastMessageInRoom(roomID string, msg interface{}) error {
+	s.mu.RLock()
+	clients := s.clientsInRoom[roomID]
+	fmt.Printf("Clients in room: %v\n", clients)
+	s.mu.RUnlock()
+
+	for clientID, ws := range clients {
+		fmt.Printf("Client ID in broadcast: %s\n", clientID)
+		err := websocket.JSON.Send(ws, msg)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error sending message to client %s: %s\n", clientID, err)
+			// remove the client from the list of clients in the room
+			s.mu.Lock()
+			delete(clients, clientID)
+			s.mu.Unlock()
 		}
-		return nil
 	}
-	return fmt.Errorf("invalid room ID: %s", roomID)
+
+	return nil
 }
 
-// addClientToRoom is a concurrent safe method for adding clients to a room
+// addClientToRoom checks if a the key that has roomID as a key exists in the clientsInRoom map
+// if it doesn't a new empty map will be created and assigned to that roomID
+// then the clientID is added to the map with the connection as its value and roomID
+// as a key to its map.
 func (s *GameServer) addClientToRoom(roomID, clientID string, conn *websocket.Conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -329,6 +257,16 @@ func (s *GameServer) addClientToRoom(roomID, clientID string, conn *websocket.Co
 		s.clientsInRoom[roomID] = make(map[string]*websocket.Conn)
 	}
 	s.clientsInRoom[roomID][clientID] = conn
+}
+
+// setClientConnection updates the connection in the map
+func (s *GameServer) setClientConnection(roomID, clientID string, conn *websocket.Conn) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.clientsInRoom[roomID]; ok {
+		s.clientsInRoom[roomID][clientID] = conn
+	}
 }
 
 // removeClientFromRoom is a concurrent safe method for removing clients from a room

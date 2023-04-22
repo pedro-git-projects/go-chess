@@ -22,7 +22,7 @@ const JoinRoom = () => {
         setError(resp.error)
       } else {
         console.log("clientID: ", resp.client_id)
-        navigate(`/room/${resp.room_id}`, { state: {roomID: resp.room_id}})
+        navigate(`/room/${resp.room_id}`, { state: { roomID: resp.room_id, clientID: resp.client_id }})
       }
       ws.close()
     } catch(err) {
