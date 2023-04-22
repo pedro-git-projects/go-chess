@@ -1,8 +1,6 @@
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {useWebSocket} from "../../contexts/WebSocketContext"
-import connectToWS from "../../hooks/connectToWS"
 import sendMessage from "../../hooks/sendMessage"
 
 const JoinRoom = () => {

@@ -50,10 +50,6 @@ func (s *GameServer) handleCreateRoom(ws *websocket.Conn, r *BoardRequest) {
 }
 
 func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
-	err := websocket.JSON.Receive(ws, r)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
-	}
 	roomID := r.RoomID
 	if s.table.HasKey(roomID) {
 		clientID := utils.GenerateRoomId()
@@ -65,7 +61,7 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 				ClientID: "",
 				Error:    fmt.Sprintf("invalid room ID: %s", roomID),
 			}
-			err = websocket.JSON.Send(ws, resp)
+			err := websocket.JSON.Send(ws, resp)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 			}
@@ -93,17 +89,10 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 			ClientID: clientID,
 			Error:    "",
 		}
+		fmt.Println("Sending response: ")
 		err = websocket.JSON.Send(ws, resp)
 		if err != nil {
-			resp := JoinRoomResponse{
-				RoomID:   "",
-				ClientID: "",
-				Error:    err.Error(),
-			}
-			err = websocket.JSON.Send(ws, resp)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-			}
+			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
 	} else {
 		resp := JoinRoomResponse{
@@ -111,7 +100,7 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 			ClientID: "",
 			Error:    fmt.Sprintf("invalid room ID: %s", roomID),
 		}
-		err = websocket.JSON.Send(ws, resp)
+		err := websocket.JSON.Send(ws, resp)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
