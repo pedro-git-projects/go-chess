@@ -12,6 +12,7 @@ import blackQueen from "../../assets/black_queen.svg"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
 import sendMessage from "../../hooks/sendMessage"
+import { useWebSocket } from "../../contexts/WebSocketContext"
 
 const getPieceSymbol = (piece) => {
   const [color, type] = piece.split(" ")
@@ -32,12 +33,12 @@ const getPieceSymbol = (piece) => {
   return <img src={svg} alt={type}/>
 }
 
-const renderSquare = ({roomID}, {ws}, colIndex, rowIndex, boardState, setBoardState) => {
+const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) => {
   const coordinate = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
-  const square = boardState.find((square) => square.coordinate === coordinate)
+  const square =  boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
   const backgroundColor = isEvenSquare ? "bg-gray-400" : "bg-white"
-
+  const ws = useWebSocket()
   const handleClick = async () => {
     console.log(coordinate)
     const msg = JSON.stringify({message:"calc",coordinate: coordinate, room_id:roomID})
@@ -62,23 +63,23 @@ const renderSquare = ({roomID}, {ws}, colIndex, rowIndex, boardState, setBoardSt
   )
 }
 
-const renderRow = ({roomID}, {ws}, rowIndex, boardState, setBoardState) => (
+const renderRow = ({roomID}, rowIndex, boardState, setBoardState) => (
   <div key={`row${rowIndex}`} className="flex flex-row-reverse">
-    { Array.from(Array(8).keys()).map((colIndex) => renderSquare({roomID}, {ws}, colIndex, rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((colIndex) => renderSquare({roomID}, colIndex, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const renderBoard = ({roomID}, {ws}, boardState, setBoardState) => (
+const renderBoard = ({roomID}, boardState, setBoardState) => (
   <div>
-    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID}, {ws}, rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID}, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const ChessBoard = ({roomID, ws, clientID}) => {
+const ChessBoard = ({roomID, clientID}) => {
   const [boardState, setBoardState] = useState([])
+  const ws = useWebSocket()
   useEffect(() => {
     const fetchBoardState = async () => {
-      console.log("WebSocket connection established.")
       const msg = JSON.stringify({message:"render", room_id:roomID, clientID:clientID})
       const resp = await sendMessage(ws, msg)
       console.log("response received:", resp)
@@ -87,7 +88,7 @@ const ChessBoard = ({roomID, ws, clientID}) => {
     fetchBoardState()
   }, [])
 
-  return renderBoard({roomID}, {ws}, boardState, setBoardState)
+  return renderBoard({roomID}, boardState, setBoardState)
 }
 
 export default ChessBoard

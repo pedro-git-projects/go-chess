@@ -201,6 +201,7 @@ func (s *GameServer) gameLoop(ws *websocket.Conn) {
 			fmt.Fprintf(os.Stderr, "board::error 1 receiving message: %s\n", err)
 			return
 		}
+		fmt.Println(r.Message)
 		switch r.Message {
 		case "create":
 			s.handleCreateRoom(ws, r)

@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { WebsocketProvider } from './contexts/WebSocketContext'
 import Err from './components/routes/Err'
 import Learn from './components/routes/Learn'
 import Play from './components/routes/Play'
@@ -40,6 +41,8 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <RouterProvider router={router}/>
+    <WebsocketProvider>    
+      <RouterProvider router={router}/>
+    </WebsocketProvider>
   </React.StrictMode>,
 )

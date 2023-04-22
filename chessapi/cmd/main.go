@@ -14,7 +14,7 @@ var port = ":8080"
 // I need the board ws in the map
 func main() {
 	srv := NewServer()
-	http.Handle("/", websocket.Handler(srv.handleWS))
+	http.Handle("/game", websocket.Handler(srv.gameLoop))
 	fmt.Printf("starting server on port %s\n", port)
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
