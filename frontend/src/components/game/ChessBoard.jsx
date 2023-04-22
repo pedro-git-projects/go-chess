@@ -34,6 +34,8 @@ const getPieceSymbol = (piece) => {
 }
 
 const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) => {
+  const [draggingFrom, setDraggingFrom] = useState(null)
+  const [droppingTo, setDroppingTo] = useState(null)
   const coordinate = `${String.fromCharCode(104 - colIndex)}${rowIndex + 1}`  
   const square =  boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
@@ -51,15 +53,45 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
       return { ...square, highlighted: false }
     }))
   }
-
+  const handleDragStart = (event, coordinate) => {
+    event.preventDefault()
+    setDraggingFrom(coordinate)
+  }
+  const handleDragOver = (event, coordinate) => {
+    event.preventDefault()
+    setDroppingTo(coordinate)
+  }
+  const handleDrop = async (event, coordinate) => {
+    event.preventDefault()
+    if (draggingFrom && droppingTo) {
+      const msg = JSON.stringify({ message: "move", room_id: roomID, from: draggingFrom, to: droppingTo })
+      const resp = await sendMessage(ws, msg)
+      console.log("response received:", resp)
+      setBoardState(JSON.parse(resp.state))
+    }
+    setDraggingFrom(null)
+    setDroppingTo(null)
+  }
   return (
     <div
       key={`${colIndex}${rowIndex}`}
       className={`w-16 h-16 flex items-center justify-center ${backgroundColor} ${square?.highlighted ? 'bg-yellow-500' : ''}`}
       onClick={handleClick}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain", coordinate)
+      }}
+      onDragOver={(e) => {
+        e.preventDefault()
+      }}
+      onDrop={(e) => {
+        const from = e.dataTransfer.getData("text/plain")
+        const to = coordinate
+        const msg = JSON.stringify({message: "move", room_id: roomID, from: from, to: to})
+        sendMessage(ws, msg)
+      }}
     >
       {square && square.piece !== "empty" && getPieceSymbol(square.piece)}
-    </div>
+    </div>  
   )
 }
 
@@ -77,7 +109,9 @@ const renderBoard = ({roomID}, boardState, setBoardState) => (
 
 const ChessBoard = ({roomID, clientID}) => {
   const [boardState, setBoardState] = useState([])
+  const [latestMove, setLatestMove] = useState(null) // added state variable
   const ws = useWebSocket()
+
   useEffect(() => {
     const fetchBoardState = async () => {
       const msg = JSON.stringify({message:"render", room_id:roomID, clientID:clientID})
@@ -102,13 +136,30 @@ const ChessBoard = ({roomID, clientID}) => {
           }
         })
         setBoardState(newBoardState)
+      } else if (data.state && data.from === latestMove?.from && data.to === latestMove?.to) { // updated condition
+        setBoardState(JSON.parse(data.state))
+        setLatestMove(null)
       }
     }
     ws.addEventListener('message', handleMessage)
     return () => {
       ws.removeEventListener('message', handleMessage)
     }
-  }, [boardState, ws])
+  }, [boardState, latestMove, ws])
+
+  const handleDrop = async (event, coordinate) => {
+    event.preventDefault()
+    if (draggingFrom && droppingTo) {
+      const from = draggingFrom
+      const to = droppingTo
+      setLatestMove({from, to}) // updated latest move
+      const msg = JSON.stringify({ message: "move", room_id: roomID, from, to })
+      const resp = await sendMessage(ws, msg)
+      console.log("response received:", resp)
+    }
+    setDraggingFrom(null)
+    setDroppingTo(null)
+  }  
   return renderBoard({roomID}, boardState, setBoardState)
 }
 
