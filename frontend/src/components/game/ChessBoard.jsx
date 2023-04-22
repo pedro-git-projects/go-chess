@@ -88,6 +88,27 @@ const ChessBoard = ({roomID, clientID}) => {
     fetchBoardState()
   }, [])
 
+  // Listen to WebSocket messages and update boardState
+  useEffect(() => {
+    const handleMessage = (event) => {
+      const data = JSON.parse(event.data)
+      if (data.legal_movements) {
+        const legalMovements = JSON.parse(data.legal_movements)
+        const newBoardState = boardState.map((square) => {
+          if (legalMovements.some((d) => d.coordinate === square.coordinate)) {
+            return { ...square, highlighted: true }
+          } else {
+            return { ...square, highlighted: false }
+          }
+        })
+        setBoardState(newBoardState)
+      }
+    }
+    ws.addEventListener('message', handleMessage)
+    return () => {
+      ws.removeEventListener('message', handleMessage)
+    }
+  }, [boardState, ws])
   return renderBoard({roomID}, boardState, setBoardState)
 }
 

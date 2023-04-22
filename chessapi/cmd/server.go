@@ -148,7 +148,7 @@ func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardReque
 			LegalMovements: string(marshaled),
 			Error:          "",
 		}
-		err = s.broadcast(roomID, res)
+		err = s.messageRoom(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 			return
@@ -176,7 +176,7 @@ func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 			GameState: "",
 			Error:     fmt.Sprintf("Could not render board: invalid game state"),
 		}
-		err := s.broadcast(roomID, res)
+		err := s.messageRoom(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error broadcasting message: %s\n", err)
 		}
@@ -187,7 +187,7 @@ func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 		GameState: m,
 		Error:     "",
 	}
-	err := s.broadcast(roomID, resp)
+	err := s.messageRoom(roomID, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
 	}
@@ -221,7 +221,7 @@ func (s *GameServer) handleWS(ws *websocket.Conn) {
 }
 
 // broadcasts for all clients in a room
-func (s *GameServer) broadcast(roomID string, msg interface{}) error {
+func (s *GameServer) messageRoom(roomID string, msg interface{}) error {
 	s.mu.RLock()
 	clients := s.clientsInRoom[roomID]
 	fmt.Printf("Clients in room: %v\n", clients)
