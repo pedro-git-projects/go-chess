@@ -182,6 +182,41 @@ func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 	}
 }
 
+// handleMovePiece receives a:
+// {"message":"move", "room_id":"id", "from":"xn", "to":"yn"}
+// and responds with {"satate":"[]"}
+func (s *GameServer) handleMovePiece(ws *websocket.Conn, r *BoardRequest) {
+	roomID := r.RoomID
+	game := s.table.Game(roomID)
+
+	f := *r.From
+	t := *r.To
+
+	from, err := utils.CoordFromStr(f)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "move::error 1 failed to convert to coordinate: %s\n", err)
+	}
+	to, err := utils.CoordFromStr(t)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "move::error 1 failed to convert to coordinate: %s\n", err)
+	}
+
+	color := game.PieceColor(from)
+	game.MovePiece(from, to, color)
+
+	gameState := game.MarshalState()
+	resp := RenderBoardResponse{
+		GameState: gameState,
+		Error:     "",
+	}
+
+	err = s.messageRoom(roomID, resp)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
+	}
+
+}
+
 func (s *GameServer) gameLoop(ws *websocket.Conn) {
 	for {
 		r := new(BoardRequest)
@@ -200,6 +235,8 @@ func (s *GameServer) gameLoop(ws *websocket.Conn) {
 			s.handleRender(ws, r)
 		case "calc":
 			s.handleCalculateLegalMoves(ws, r)
+		case "move":
+			s.handleMovePiece(ws, r)
 		}
 	}
 }

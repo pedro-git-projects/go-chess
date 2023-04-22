@@ -49,4 +49,6 @@ type BoardRequest struct {
 	RoomID     string  `json:"room_id"`
 	ClientID   string  `json:"client_id"`
 	Coordinate *string `json:"coordinate,omitempty"`
+	From       *string `json:"from,omitempty"`
+	To         *string `json:"to,omitempty"`
 }
