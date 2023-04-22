@@ -72,10 +72,10 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
     setDraggingFrom(null)
     setDroppingTo(null)
   }
-  return (
+   return (
     <div
       key={`${colIndex}${rowIndex}`}
-      className={`w-16 h-16 flex items-center justify-center ${backgroundColor} ${square?.highlighted ? 'bg-yellow-500' : ''}`}
+      className={`w-16 h-16 flex items-center justify-center ${backgroundColor} ${square?.highlighted ? 'relative' : ''}`}
       onClick={handleClick}
       onDragStart={(e) => {
         e.dataTransfer.setData("text/plain", coordinate)
@@ -91,6 +91,11 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
       }}
     >
       {square && square.piece !== "empty" && getPieceSymbol(square.piece)}
+      {square?.highlighted && (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="w-2 h-2 rounded-full bg-zinc-900"></div>
+        </div>
+      )}
     </div>  
   )
 }
