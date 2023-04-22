@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import whitePawn from "../../assets/white_pawn.svg"
 import blackPawn from "../../assets/black_pawn.svg"
 import whiteKnight from "../../assets/white_horse.svg"
@@ -34,7 +34,7 @@ const getPieceSymbol = (piece) => {
 }
 
 const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) => {
-  const coordinate = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
+  const coordinate = `${String.fromCharCode(104 - colIndex)}${rowIndex + 1}`  
   const square =  boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
   const backgroundColor = isEvenSquare ? "bg-gray-400" : "bg-white"
@@ -64,14 +64,14 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
 }
 
 const renderRow = ({roomID}, rowIndex, boardState, setBoardState) => (
-  <div key={`row${rowIndex}`} className="flex flex-row-reverse">
-    { Array.from(Array(8).keys()).map((colIndex) => renderSquare({roomID}, colIndex, rowIndex, boardState, setBoardState)) }
+  <div key={`row${rowIndex}`} className="flex flex-row">
+    { Array.from(Array(8).keys()).reverse().map((colIndex) => renderSquare({roomID}, colIndex, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
 const renderBoard = ({roomID}, boardState, setBoardState) => (
   <div>
-    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID}, rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).reverse().map((rowIndex) => renderRow({roomID}, rowIndex, boardState, setBoardState)) }  
   </div>
 )
 
