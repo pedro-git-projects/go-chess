@@ -67,12 +67,11 @@ const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) =
       const msg = JSON.stringify({ message: "move", room_id: roomID, from: draggingFrom, to: droppingTo })
       const resp = await sendMessage(ws, msg)
       console.log("response received:", resp)
-      setBoardState(JSON.parse(resp.state))
     }
     setDraggingFrom(null)
     setDroppingTo(null)
   }
-   return (
+  return (
     <div
       key={`${colIndex}${rowIndex}`}
       className={`w-16 h-16 flex items-center justify-center ${backgroundColor} ${square?.highlighted ? 'relative' : ''}`}
@@ -112,9 +111,9 @@ const renderBoard = ({roomID}, boardState, setBoardState) => (
   </div>
 )
 
-const ChessBoard = ({roomID, clientID}) => {
+const ChessBoard = ({roomID, clientID, turn, onTurnUpdate}) => {
   const [boardState, setBoardState] = useState([])
-  const [latestMove, setLatestMove] = useState(null) // added state variable
+  const [latestMove, setLatestMove] = useState(null) 
   const ws = useWebSocket()
 
   useEffect(() => {
@@ -143,6 +142,7 @@ const ChessBoard = ({roomID, clientID}) => {
         setBoardState(newBoardState)
       } else if (data.state && data.from === latestMove?.from && data.to === latestMove?.to) { // updated condition
         setBoardState(JSON.parse(data.state))
+        onTurnUpdate(data.turn) // <- if I use JSON.parse()
         setLatestMove(null)
       }
     }

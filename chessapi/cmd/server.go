@@ -38,9 +38,11 @@ func (s *GameServer) handleCreateRoom(ws *websocket.Conn, r *BoardRequest) {
 	}
 	// add client to room
 	s.addClientToRoom(roomID, clientID, ws)
+	turn := "white"
 	resp := CreateRoomResponse{
 		RoomID:   roomID,
 		ClientID: clientID,
+		Turn:     turn,
 	}
 	err = websocket.JSON.Send(ws, resp)
 	if err != nil {
@@ -207,9 +209,9 @@ func (s *GameServer) handleMovePiece(ws *websocket.Conn, r *BoardRequest) {
 	gameState := game.MarshalState()
 	resp := RenderBoardResponse{
 		GameState: gameState,
+		Turn:      game.CurrentTurn().String(),
 		Error:     "",
 	}
-
 	err = s.messageRoom(roomID, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
