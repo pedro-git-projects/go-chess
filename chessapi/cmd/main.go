@@ -10,10 +10,11 @@ import (
 
 var port = ":8080"
 
+// I'm passing the create-room ws to the map
+// I need the board ws in the map
 func main() {
 	srv := NewServer()
-	http.Handle("/create-room", websocket.Handler(srv.receiveCreateRoom))
-	http.Handle("/join-room", websocket.Handler(srv.receiveJoinRoom))
+	http.Handle("/game", websocket.Handler(srv.gameLoop))
 	fmt.Printf("starting server on port %s\n", port)
 	err := http.ListenAndServe(port, nil)
 	if err != nil {

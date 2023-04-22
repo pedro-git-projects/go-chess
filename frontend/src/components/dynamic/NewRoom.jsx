@@ -1,20 +1,20 @@
 import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
-import SendMessage from '../websockets/SendMessage'
-import ConnectToWS from '../websockets/ConnectToWS'
+import { useWebSocket } from '../../contexts/WebSocketContext'
+import sendMessage from "../../hooks/sendMessage"
 
 const NewRoom = () => {
   const navigate = useNavigate()
   const [response, setResponse] = useState("")
+  const ws = useWebSocket() // moved hook call to top level
+
   const handleClick = async () => {
     try {
-      const ws = await ConnectToWS("ws://localhost:8080/create-room")
       const message = JSON.stringify({message: "create"})
-      const resp = await SendMessage(ws, message)
+      const resp = await sendMessage(ws, message) // pass WebSocket instance as parameter
       setResponse(resp)
-      ws.close()
       console.log("clientID: ", resp.client_id)
-      navigate(`/room/${resp.room_id}`, { state: {roomID: resp.room_id}})    
+      navigate(`/room/${resp.room_id}`, { state: { roomID: resp.room_id, clientID: resp.client_id }})
     } catch(err) {
       console.log("Error: ", err)
     }

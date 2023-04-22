@@ -11,6 +11,8 @@ import whiteQueen from "../../assets/white_queen.svg"
 import blackQueen from "../../assets/black_queen.svg"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
+import sendMessage from "../../hooks/sendMessage"
+import { useWebSocket } from "../../contexts/WebSocketContext"
 
 const getPieceSymbol = (piece) => {
   const [color, type] = piece.split(" ")
@@ -33,29 +35,21 @@ const getPieceSymbol = (piece) => {
 
 const renderSquare = ({roomID}, colIndex, rowIndex, boardState, setBoardState) => {
   const coordinate = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
-  const square = boardState.find((square) => square.coordinate === coordinate)
+  const square =  boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
   const backgroundColor = isEvenSquare ? "bg-gray-400" : "bg-white"
-
+  const ws = useWebSocket()
   const handleClick = async () => {
     console.log(coordinate)
-    const response = await fetch(`http://localhost:8080/calc/${roomID}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ coordinate })
-    })
-
-    if (response.ok) {
-      const data = await response.json()
-      setBoardState(boardState.map((square) => {
-        if (data.some((d) => d.coordinate === square.coordinate)) {
-          return { ...square, highlighted: true }
-        }
-        return { ...square, highlighted: false }
-      }))
-    }
+    const msg = JSON.stringify({message:"calc",coordinate: coordinate, room_id:roomID})
+    const resp = await sendMessage(ws, msg)
+    console.log("response received:", resp)      
+    setBoardState(boardState.map((square) => {
+      if (JSON.parse(resp.legal_movements).some((d) => d.coordinate === square.coordinate)) {          
+        return { ...square, highlighted: true }
+      }
+      return { ...square, highlighted: false }
+    }))
   }
 
   return (
@@ -77,17 +71,19 @@ const renderRow = ({roomID}, rowIndex, boardState, setBoardState) => (
 
 const renderBoard = ({roomID}, boardState, setBoardState) => (
   <div>
-    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID},rowIndex, boardState, setBoardState)) }
+    { Array.from(Array(8).keys()).map((rowIndex) => renderRow({roomID}, rowIndex, boardState, setBoardState)) }
   </div>
 )
 
-const ChessBoard = ({roomID}) => {
+const ChessBoard = ({roomID, clientID}) => {
   const [boardState, setBoardState] = useState([])
+  const ws = useWebSocket()
   useEffect(() => {
-    async function fetchBoardState() {
-      const response = await fetch(`http://localhost:8080/board/${roomID}`)
-      const data = await response.json()
-      setBoardState(data)
+    const fetchBoardState = async () => {
+      const msg = JSON.stringify({message:"render", room_id:roomID, clientID:clientID})
+      const resp = await sendMessage(ws, msg)
+      console.log("response received:", resp)
+      setBoardState(JSON.parse(resp.state))
     }
     fetchBoardState()
   }, [])

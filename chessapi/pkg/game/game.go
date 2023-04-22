@@ -43,6 +43,10 @@ func (g *Game) AddClient(c *Client) error {
 	return errors.New("Game is full")
 }
 
+func (game *Game) PieceColor(c utils.Coordinate) piece.Color {
+	return game.board.PieceAt(c).Color()
+}
+
 // setCurrentTurn takes a piece color and sets the currentTurn color
 // to the opposite color
 func (game *Game) setCurrentTurn(color piece.Color) {

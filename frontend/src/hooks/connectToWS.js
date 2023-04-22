@@ -1,4 +1,4 @@
-const ConnectToWS = (url) => 
+const connectToWS = (url) => 
   new Promise((resolve, reject) => {
     const ws = new WebSocket(url)
     ws.onopen = () => {
@@ -10,4 +10,4 @@ const ConnectToWS = (url) =>
     }
   })
 
-export default ConnectToWS
+export default connectToWS
