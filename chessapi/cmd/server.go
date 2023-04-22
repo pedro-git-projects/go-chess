@@ -25,49 +25,37 @@ func NewServer() *GameServer {
 	}
 }
 
-func (s *GameServer) receiveCreateRoom(ws *websocket.Conn) {
-	msg := new(CreateRoomRequest)
-	err := websocket.JSON.Receive(ws, msg)
+func (s *GameServer) handleCreateRoom(ws *websocket.Conn, r *BoardRequest) {
+	roomID := utils.GenerateRoomId()
+	clientID := utils.GenerateRoomId()
+	fmt.Printf("Client ID: %s\n", clientID)
+	gameState := game.NewGame()
+	s.table.SetGame(roomID, gameState)
+	// try to add client to game
+	err := s.table.Game(roomID).AddClient(game.NewClient(clientID))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
+		fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 	}
-	if msg.Message == "create" {
-		roomID := utils.GenerateRoomId()
-		clientID := utils.GenerateRoomId()
-		fmt.Printf("Client ID: %s\n", clientID)
-		gameState := game.NewGame()
-		s.table.SetGame(roomID, gameState)
-		// try to add client to game
-		err := s.table.Game(roomID).AddClient(game.NewClient(clientID))
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-		}
-		// add client to room
-		s.addClientToRoom(roomID, clientID, ws)
-		resp := CreateRoomResponse{
-			RoomID:   roomID,
-			ClientID: clientID,
-		}
-		err = websocket.JSON.Send(ws, resp)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
-		}
+	// add client to room
+	s.addClientToRoom(roomID, clientID, ws)
+	resp := CreateRoomResponse{
+		RoomID:   roomID,
+		ClientID: clientID,
 	}
+	err = websocket.JSON.Send(ws, resp)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+	}
+
 }
 
-// receiveJoinRoom expects to receive a JSON object containing
-// the message join and a roomID
-// if the roomID is in the game map and there is an empty slot
-// then the client joins that room
-func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
-	// receive request
-	r := new(JoinRoomRequest)
+func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 	err := websocket.JSON.Receive(ws, r)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error receiving message: %s\n", err)
 	}
 	roomID := r.RoomID
-	if r.Message == "join" && s.table.HasKey(roomID) {
+	if s.table.HasKey(roomID) {
 		clientID := utils.GenerateRoomId()
 		gameState := s.table.Game(roomID)
 		// check if gameState has been correctly populated
@@ -132,7 +120,7 @@ func (s *GameServer) receiveJoinRoom(ws *websocket.Conn) {
 
 func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardRequest) {
 	roomID := r.RoomID
-	if r.Coordinate != nil && r.Message == "calc" && s.table.HasKey(roomID) {
+	if r.Coordinate != nil && s.table.HasKey(roomID) {
 		c, err := utils.CoordFromStr(*r.Coordinate)
 		if err != nil {
 			log.Println("Error converting object to coordinate:", err)
@@ -160,8 +148,7 @@ func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardReque
 			LegalMovements: string(marshaled),
 			Error:          "",
 		}
-		//	err = s.broadcastMessageInRoom(roomID, res) // Error origin
-		err = websocket.JSON.Send(ws, res)
+		err = s.broadcast(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 			return
@@ -171,12 +158,13 @@ func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardReque
 
 func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 	roomID := r.RoomID
+	clientID := r.ClientID
 	if r.Message != "render" || !s.table.HasKey(roomID) {
 		res := RenderBoardResponse{
 			GameState: "",
 			Error:     fmt.Sprintf("Could not render board, invalid data"),
 		}
-		err := websocket.JSON.Send(ws, res)
+		err := s.messageClient(roomID, clientID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed to send response: %s\n", err)
 		}
@@ -188,7 +176,7 @@ func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 			GameState: "",
 			Error:     fmt.Sprintf("Could not render board: invalid game state"),
 		}
-		err := s.broadcastMessageInRoom(roomID, res)
+		err := s.broadcast(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error broadcasting message: %s\n", err)
 		}
@@ -199,13 +187,13 @@ func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 		GameState: m,
 		Error:     "",
 	}
-	err := websocket.JSON.Send(ws, resp)
+	err := s.broadcast(roomID, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
 	}
 }
 
-func (s *GameServer) receiveBoard(ws *websocket.Conn) {
+func (s *GameServer) gameLoop(ws *websocket.Conn) {
 	for {
 		r := new(BoardRequest)
 		err := websocket.JSON.Receive(ws, r)
@@ -214,6 +202,10 @@ func (s *GameServer) receiveBoard(ws *websocket.Conn) {
 			return
 		}
 		switch r.Message {
+		case "create":
+			s.handleCreateRoom(ws, r)
+		case "join":
+			s.handleJoinRoom(ws, r)
 		case "render":
 			s.handleRender(ws, r)
 		case "calc":
@@ -222,14 +214,17 @@ func (s *GameServer) receiveBoard(ws *websocket.Conn) {
 	}
 }
 
-// broadcastMessage sends a message to all clients in a room
-// is the error
-func (s *GameServer) broadcastMessageInRoom(roomID string, msg interface{}) error {
+// handleWS runs the gameLoop inside a goroutine
+func (s *GameServer) handleWS(ws *websocket.Conn) {
+	go s.gameLoop(ws)
+}
+
+// broadcasts for all clients in a room
+func (s *GameServer) broadcast(roomID string, msg interface{}) error {
 	s.mu.RLock()
 	clients := s.clientsInRoom[roomID]
 	fmt.Printf("Clients in room: %v\n", clients)
 	s.mu.RUnlock()
-
 	for clientID, ws := range clients {
 		fmt.Printf("Client ID in broadcast: %s\n", clientID)
 		err := websocket.JSON.Send(ws, msg)
@@ -241,7 +236,22 @@ func (s *GameServer) broadcastMessageInRoom(roomID string, msg interface{}) erro
 			s.mu.Unlock()
 		}
 	}
+	return nil
+}
 
+// messages a single client
+func (s *GameServer) messageClient(roomID, clientID string, msg interface{}) error {
+	s.mu.RLock()
+	clientConn := s.clientsInRoom[roomID][clientID]
+	s.mu.RUnlock()
+	err := websocket.JSON.Send(clientConn, msg)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error sending message to client %s: %s\n", clientID, err)
+		// remove the client from the list of clients in the room
+		s.mu.Lock()
+		delete(s.clientsInRoom[roomID], clientID)
+		s.mu.Unlock()
+	}
 	return nil
 }
 
