@@ -95,3 +95,12 @@ func (g Game) PrintBoard() {
 func (g Game) MarshalState() string {
 	return g.board.Marshal()
 }
+
+func (g *Game) ClientFromID(clientID string) *Client {
+	if g.client1.id == clientID {
+		return g.client1
+	} else if g.client2.id == clientID {
+		return g.client2
+	}
+	return nil
+}
