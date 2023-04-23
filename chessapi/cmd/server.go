@@ -38,9 +38,11 @@ func (s *GameServer) handleCreateRoom(ws *websocket.Conn, r *BoardRequest) {
 	}
 	// add client to room
 	s.addClientToRoom(roomID, clientID, ws)
+	turn := "white"
 	resp := CreateRoomResponse{
 		RoomID:   roomID,
 		ClientID: clientID,
+		Turn:     turn,
 	}
 	err = websocket.JSON.Send(ws, resp)
 	if err != nil {
@@ -109,7 +111,10 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 
 func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardRequest) {
 	roomID := r.RoomID
-	if r.Coordinate != nil && s.table.HasKey(roomID) {
+	clientID := r.ClientID
+	game := s.table.Game(roomID)
+	client := game.ClientFromID(clientID)
+	if r.Coordinate != nil && s.table.HasKey(roomID) && client.Color() == game.CurrentTurn() {
 		c, err := utils.CoordFromStr(*r.Coordinate)
 		if err != nil {
 			log.Println("Error converting object to coordinate:", err)
@@ -138,6 +143,16 @@ func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardReque
 			Error:          "",
 		}
 		err = s.messageRoom(roomID, res)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
+			return
+		}
+	} else {
+		res := CalculateResponse{
+			LegalMovements: "",
+			Error:          "",
+		}
+		err := s.messageRoom(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 			return
@@ -187,7 +202,9 @@ func (s *GameServer) handleRender(ws *websocket.Conn, r *BoardRequest) {
 // and responds with {"satate":"[]"}
 func (s *GameServer) handleMovePiece(ws *websocket.Conn, r *BoardRequest) {
 	roomID := r.RoomID
+	clientID := r.ClientID
 	game := s.table.Game(roomID)
+	client := game.ClientFromID(clientID)
 
 	f := *r.From
 	t := *r.To
@@ -201,20 +218,19 @@ func (s *GameServer) handleMovePiece(ws *websocket.Conn, r *BoardRequest) {
 		fmt.Fprintf(os.Stderr, "move::error 1 failed to convert to coordinate: %s\n", err)
 	}
 
-	color := game.PieceColor(from)
+	color := client.Color()
 	game.MovePiece(from, to, color)
 
 	gameState := game.MarshalState()
 	resp := RenderBoardResponse{
 		GameState: gameState,
+		Turn:      game.CurrentTurn().String(),
 		Error:     "",
 	}
-
 	err = s.messageRoom(roomID, resp)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render::error 2 receiving message: %s\n", err)
 	}
-
 }
 
 func (s *GameServer) gameLoop(ws *websocket.Conn) {

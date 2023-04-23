@@ -1,7 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import ChessBoard from "../game/ChessBoard"
 import { Layout } from "../ui/Layout"
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useWebSocket } from '../../contexts/WebSocketContext'
 
 const Room = () => {
@@ -9,20 +9,26 @@ const Room = () => {
   const navigate = useNavigate()
   const roomID = location.state?.roomID || ""
   const clientID = location.state?.clientID || ""
+  console.log('location.state?.turn:', location.state?.turn)
+  const [turn, setTurn] = useState(location.state?.turn || "white")  
   const ws = useWebSocket()
   useEffect(() => {
     if (!roomID) {
       navigate("/play")
     }
   }, [roomID, navigate])
+  const handleTurnUpdate = (newTurn) => {
+    setTurn(newTurn)
+  }
   if (!roomID || !ws) {
     return null
   }
   return (
     <Layout>
+      <h1 className="text-3xl font-bold text-center py-3">{`${turn}'s turn`}</h1>
       <div className="w-full h-full flex align-middle items-center justify-center">
         <div className="mx-auto">
-          <ChessBoard roomID={roomID} clientID={clientID}></ChessBoard>
+          <ChessBoard roomID={roomID} clientID={clientID} turn={turn} onTurnUpdate={handleTurnUpdate}></ChessBoard>
         </div>
       </div>
     </Layout>

@@ -57,6 +57,10 @@ func (game *Game) setCurrentTurn(color piece.Color) {
 	game.currentTurn = piece.White
 }
 
+func (game *Game) CurrentTurn() piece.Color {
+	return game.currentTurn
+}
+
 // MovePiece takes two coordiantes, from and to
 // checks if the checks if the current turns is of adequate color
 // moves the piece and updates the current color turn if it is fit
@@ -90,4 +94,13 @@ func (g Game) PrintBoard() {
 // MarshalState returns the current board state as a JSON object
 func (g Game) MarshalState() string {
 	return g.board.Marshal()
+}
+
+func (g *Game) ClientFromID(clientID string) *Client {
+	if g.client1.id == clientID {
+		return g.client1
+	} else if g.client2.id == clientID {
+		return g.client2
+	}
+	return nil
 }

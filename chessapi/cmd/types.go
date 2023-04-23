@@ -7,6 +7,7 @@ type CreateRoomRequest struct {
 type CreateRoomResponse struct {
 	RoomID   string `json:"room_id"`
 	ClientID string `json:"client_id"`
+	Turn     string `json:"turn"`
 }
 
 type JoinRoomRequest struct {
@@ -28,6 +29,7 @@ type RenderBoardRequest struct {
 type RenderBoardResponse struct {
 	GameState string `json:"state"`
 	Error     string `json:"error"`
+	Turn      string `json:"turn"`
 }
 
 type CalculateRequest struct {
