@@ -142,7 +142,7 @@ const ChessBoard = ({roomID, clientID, turn, onTurnUpdate}) => {
         setBoardState(newBoardState)
       } else if (data.state && data.from === latestMove?.from && data.to === latestMove?.to) { // updated condition
         setBoardState(JSON.parse(data.state))
-        onTurnUpdate(data.turn) // <- if I use JSON.parse()
+        onTurnUpdate(data.turn || JSON.parse(data.turn)) 
         setLatestMove(null)
       }
     }
