@@ -1,3 +1,4 @@
+
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {useWebSocket} from "../../contexts/WebSocketContext"
@@ -21,7 +22,8 @@ const JoinRoom = () => {
         setError(resp.error)
       } else {
         console.log("clientID: ", resp.client_id)
-        navigate(`/room/${resp.room_id}`, { state: { roomID: resp.room_id, clientID: resp.client_id }})
+        console.log("turn: ", resp.turn)
+        navigate(`/room/${resp.room_id}`, { state: { roomID: resp.room_id, clientID: resp.client_id, turn: resp.turn }})
       }
     } catch(err) {
       console.log("Error: ", err)

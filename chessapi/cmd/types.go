@@ -18,6 +18,7 @@ type JoinRoomRequest struct {
 type JoinRoomResponse struct {
 	RoomID   string `json:"room_id"`
 	ClientID string `json:"client_id"`
+	Turn     string `json:"turn"`
 	Error    string `json:"error"`
 }
 

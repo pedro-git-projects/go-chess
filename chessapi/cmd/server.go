@@ -86,9 +86,11 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 		// add client to room
 		s.addClientToRoom(roomID, clientID, ws)
 		s.table.SetGame(roomID, gameState)
+		turn := gameState.CurrentTurn().String()
 		resp := JoinRoomResponse{
 			RoomID:   roomID,
 			ClientID: clientID,
+			Turn:     turn,
 			Error:    "",
 		}
 		fmt.Println("Sending response: ")
