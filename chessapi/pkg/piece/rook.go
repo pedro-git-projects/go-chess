@@ -52,27 +52,55 @@ func (r *Rook) CalculateLegalMoves(board board) {
 	l := make([]utils.Coordinate, 0)
 
 	nextRight, ok := board.NRight(r.position, 1)
-	for ok && (!board.IsOccupied(nextRight) || !sameColor(nextRight, r, board)) {
-		l = append(l, nextRight)
-		nextRight, ok = board.NRight(nextRight, 1)
+	for ok {
+		if board.IsOccupied(nextRight) {
+			if !sameColor(nextRight, r, board) {
+				l = append(l, nextRight)
+			}
+			break
+		} else {
+			l = append(l, nextRight)
+			nextRight, ok = board.NRight(nextRight, 1)
+		}
 	}
 
 	nextLeft, ok := board.NLeft(r.position, 1)
-	for ok && (!board.IsOccupied(nextLeft) || !sameColor(nextLeft, r, board)) {
-		l = append(l, nextLeft)
-		nextLeft, ok = board.NLeft(nextLeft, 1)
+	for ok {
+		if board.IsOccupied(nextLeft) {
+			if !sameColor(nextLeft, r, board) {
+				l = append(l, nextLeft)
+			}
+			break
+		} else {
+			l = append(l, nextLeft)
+			nextLeft, ok = board.NLeft(nextLeft, 1)
+		}
 	}
 
 	nextFoward, ok := board.NFoward(r.position, 1)
-	for ok && (!board.IsOccupied(nextFoward) || !sameColor(nextFoward, r, board)) {
-		l = append(l, nextFoward)
-		nextFoward, ok = board.NFoward(nextFoward, 1)
+	for ok {
+		if board.IsOccupied(nextFoward) {
+			if !sameColor(nextFoward, r, board) {
+				l = append(l, nextFoward)
+			}
+			break
+		} else {
+			l = append(l, nextFoward)
+			nextFoward, ok = board.NFoward(nextFoward, 1)
+		}
 	}
 
 	nextBackward, ok := board.NBackward(r.position, 1)
-	for ok && (!board.IsOccupied(nextBackward) || !sameColor(nextBackward, r, board)) {
-		l = append(l, nextBackward)
-		nextBackward, ok = board.NBackward(nextBackward, 1)
+	for ok {
+		if board.IsOccupied(nextBackward) {
+			if !sameColor(nextBackward, r, board) {
+				l = append(l, nextBackward)
+			}
+			break
+		} else {
+			l = append(l, nextBackward)
+			nextBackward, ok = board.NBackward(nextBackward, 1)
+		}
 	}
 
 	r.legalMoves = l

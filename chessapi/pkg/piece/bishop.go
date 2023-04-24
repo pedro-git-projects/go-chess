@@ -41,31 +41,58 @@ func (b Bishop) LegalMoves() []utils.Coordinate {
 // slice of position the piece can move to
 // given its current position
 // and mutates the legalMoves field
-// TODO check if diagonals are being calculate correctly
 func (b *Bishop) CalculateLegalMoves(board board) {
 	l := make([]utils.Coordinate, 0)
 
 	nextfrd, ok := board.NthFowardRightDiagonal(b.position, 1)
-	for ok && (!board.IsOccupied(nextfrd) || !sameColor(nextfrd, b, board)) {
-		l = append(l, nextfrd)
+	for ok {
+		if !board.IsOccupied(nextfrd) {
+			l = append(l, nextfrd)
+		} else if !sameColor(nextfrd, b, board) {
+			l = append(l, nextfrd)
+			break
+		} else {
+			break
+		}
 		nextfrd, ok = board.NthFowardRightDiagonal(nextfrd, 1)
 	}
 
 	nextfld, ok := board.NthFowardLeftDiagonal(b.position, 1)
-	for ok && (!board.IsOccupied(nextfld) || !sameColor(nextfld, b, board)) {
-		l = append(l, nextfld)
+	for ok {
+		if !board.IsOccupied(nextfld) {
+			l = append(l, nextfld)
+		} else if !sameColor(nextfld, b, board) {
+			l = append(l, nextfld)
+			break
+		} else {
+			break
+		}
 		nextfld, ok = board.NthFowardLeftDiagonal(nextfld, 1)
 	}
 
 	nextbrd, ok := board.NthBackwardRightDiagonal(b.position, 1)
-	for ok && (!board.IsOccupied(nextbrd) || !sameColor(nextbrd, b, board)) {
-		l = append(l, nextbrd)
+	for ok {
+		if !board.IsOccupied(nextbrd) {
+			l = append(l, nextbrd)
+		} else if !sameColor(nextbrd, b, board) {
+			l = append(l, nextbrd)
+			break
+		} else {
+			break
+		}
 		nextbrd, ok = board.NthBackwardRightDiagonal(nextbrd, 1)
 	}
 
 	nextbld, ok := board.NthBackwardLeftDiagonal(b.position, 1)
-	for ok && (!board.IsOccupied(nextbld) || !sameColor(nextbld, b, board)) {
-		l = append(l, nextbld)
+	for ok {
+		if !board.IsOccupied(nextbld) {
+			l = append(l, nextbld)
+		} else if !sameColor(nextbld, b, board) {
+			l = append(l, nextbld)
+			break
+		} else {
+			break
+		}
 		nextbld, ok = board.NthBackwardLeftDiagonal(nextbld, 1)
 	}
 

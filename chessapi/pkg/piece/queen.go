@@ -45,58 +45,121 @@ func (q *Queen) CalculateLegalMoves(board board) {
 	l := make([]utils.Coordinate, 0)
 
 	foward, ok := board.NFoward(q.position, 1)
-	for ok && (!board.IsOccupied(foward) || !sameColor(foward, q, board)) {
+	for ok {
+		if board.IsOccupied(foward) {
+			if board.PieceAt(foward).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, foward)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, foward)
 		foward, ok = board.NFoward(foward, 1)
 	}
 
 	backward, ok := board.NBackward(q.position, 1)
-	for ok && (!board.IsOccupied(backward) || !sameColor(backward, q, board)) {
+	for ok {
+		if board.IsOccupied(backward) {
+			if board.PieceAt(backward).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, backward)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, backward)
 		backward, ok = board.NBackward(backward, 1)
 	}
 
 	// lateral left
 	left, ok := board.NLeft(q.position, 1)
-	for ok && (!board.IsOccupied(left) || !sameColor(left, q, board)) {
+	for ok {
+		if board.IsOccupied(left) {
+			if board.PieceAt(left).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, left)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, left)
 		left, ok = board.NLeft(left, 1)
 	}
 
 	right, ok := board.NRight(q.position, 1)
-	for ok && (!board.IsOccupied(right) || !sameColor(right, q, board)) {
+	for ok {
+		if board.IsOccupied(right) {
+			if board.PieceAt(right).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, right)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, right)
-		right, ok = board.NRight(right, 1)
+		right, ok = board.NLeft(right, 1)
 	}
 
 	// foward left diagonal
 	fLDiag, ok := board.NthFowardLeftDiagonal(q.position, 1)
-	for ok && (!board.IsOccupied(fLDiag) || !sameColor(fLDiag, q, board)) {
+	for ok {
+		if board.IsOccupied(fLDiag) {
+			if board.PieceAt(fLDiag).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, fLDiag)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, fLDiag)
 		fLDiag, ok = board.NthFowardLeftDiagonal(fLDiag, 1)
 	}
 
 	// foward right diagonal
 	fRDiag, ok := board.NthFowardRightDiagonal(q.position, 1)
-	for ok && (!board.IsOccupied(fRDiag) || !sameColor(fRDiag, q, board)) {
+	for ok {
+		if board.IsOccupied(fRDiag) {
+			if board.PieceAt(fRDiag).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, fRDiag)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, fRDiag)
 		fRDiag, ok = board.NthFowardRightDiagonal(fRDiag, 1)
 	}
 
 	// backward left diagonal
 	bLDiag, ok := board.NthBackwardLeftDiagonal(q.position, 1)
-	for ok && (!board.IsOccupied(bLDiag) || !sameColor(bLDiag, q, board)) {
+	for ok {
+		if board.IsOccupied(bLDiag) {
+			if board.PieceAt(bLDiag).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, bLDiag)
+			}
+			// cannot continue in this direction
+			break
+		}
 		l = append(l, bLDiag)
 		bLDiag, ok = board.NthBackwardLeftDiagonal(bLDiag, 1)
 	}
 
 	// backward right diagonal
 	bRDiag, ok := board.NthBackwardRightDiagonal(q.position, 1)
-	for ok && (!board.IsOccupied(bRDiag) || !sameColor(bRDiag, q, board)) {
-		l = append(l, bLDiag)
+	for ok {
+		if board.IsOccupied(bRDiag) {
+			if board.PieceAt(bRDiag).Color() != q.color {
+				// piece on this square has different color, can be eaten
+				l = append(l, bRDiag)
+			}
+			// cannot continue in this direction
+			break
+		}
+		l = append(l, bRDiag)
 		bRDiag, ok = board.NthBackwardRightDiagonal(bRDiag, 1)
 	}
-
 	q.legalMoves = l
 }
 
