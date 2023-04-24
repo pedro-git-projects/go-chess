@@ -113,15 +113,14 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 
 func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardRequest) {
 	roomID := r.RoomID
-	clientID := r.ClientID
 	game := s.table.Game(roomID)
-	client := game.ClientFromID(clientID)
-	if r.Coordinate != nil && s.table.HasKey(roomID) && client.Color() == game.CurrentTurn() {
-		c, err := utils.CoordFromStr(*r.Coordinate)
-		if err != nil {
-			log.Println("Error converting object to coordinate:", err)
-			return
-		}
+	c, err := utils.CoordFromStr(*r.Coordinate)
+	if err != nil {
+		log.Println("Error converting object to coordinate:", err)
+		return
+	}
+	pieceColor := game.PieceColor(c)
+	if r.Coordinate != nil && s.table.HasKey(roomID) && pieceColor == game.CurrentTurn() {
 		gameState := s.table.Game(roomID)
 		if gameState == nil {
 			res := CalculateResponse{
