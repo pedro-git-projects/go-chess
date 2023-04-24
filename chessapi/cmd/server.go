@@ -134,7 +134,7 @@ func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardReque
 			}
 			return
 		}
-		color := gameState.PieceColor(c)
+		color := gameState.CurrentTurn()
 		l := gameState.LegalMovements(c, color)
 		marshaled, err := json.Marshal(l)
 		if err != nil {
@@ -144,6 +144,7 @@ func (s *GameServer) handleCalculateLegalMoves(ws *websocket.Conn, r *BoardReque
 			LegalMovements: string(marshaled),
 			Error:          "",
 		}
+		fmt.Printf("Legal Movements: %v\n", l)
 		err = s.messageRoom(roomID, res)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)

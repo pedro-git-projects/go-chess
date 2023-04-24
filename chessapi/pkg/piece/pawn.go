@@ -63,7 +63,7 @@ func (p *Pawn) CalculateLegalMoves(board board) {
 		}
 
 		// piece capture
-		rDiagonal, ok := board.NthBackwardLeftDiagonal(p.position, 1)
+		rDiagonal, ok := board.NthFowardLeftDiagonal(p.position, 1)
 		if board.IsOccupied(rDiagonal) && ok && !sameColor(rDiagonal, p, board) {
 			r = append(r, rDiagonal)
 		}
