@@ -31,16 +31,14 @@ const PlayForm = () => {
           Create Room
         </button>
         <form onSubmit={handleJoinRoomSubmit} className="w-full space-y-4">
-          <label htmlFor="roomCode" className="block text-gray-700 font-medium">
-            Enter room code:
-          </label>
           <div className="flex items-center">
             <input
+              placeholder="Enter room code:"
               type="text"
               id="roomCode"
               value={roomCode}
               onChange={handleRoomCodeChange}
-      className={`border ${error ? 'bg-red-200' : 'border-gray-300'} px-3 py-2 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-600`}/>
+              className={`border ${error ? 'bg-red-200' : 'border-gray-300'} px-3 py-2 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-600`}/>
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
