@@ -1,5 +1,5 @@
 import { Layout } from "../ui/Layout"
-import PlayForm from "../ui/PlayFrom"
+import PlayForm from "../ui/PlayForm"
 
 const Play = () => ( 
   <Layout>    
