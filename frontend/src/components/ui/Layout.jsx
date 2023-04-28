@@ -2,9 +2,9 @@ import Header from "./Header"
 import Footer from "./Footer"
 
 export const Layout = ({children}) => (
-    <div className="h-screen bg-color">
+    <div>
         <Header/>
-        <main>{children}</main>
+        <main className="min-h-screen bg-color overflow-hidden">{children}</main>
         <Footer/>
     </div>
 )
