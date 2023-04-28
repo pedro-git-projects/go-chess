@@ -20,7 +20,7 @@ export const handleJoinRoom = async (roomCode, ws, navigate, setResponse, setErr
 export const handleCreateRoom = async (ws, navigate, setResponse) => {
   try {
     const message = JSON.stringify({message: "create"})
-    const resp = await sendMessage(ws, message) // pass WebSocket instance as parameter
+    const resp = await sendMessage(ws, message) 
     setResponse(resp)
     console.log("clientID: ", resp.client_id)
     navigate(`/room/${resp.room_id}`, { state: { roomID: resp.room_id, clientID: resp.client_id }})

@@ -25,7 +25,7 @@ const Room = () => {
   }
   return (
     <Layout>
-      <h1 className="text-3xl font-bold text-center py-3">{`${turn}'s turn`}</h1>
+      <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">{`${turn}'s turn`}</h2>
       <div className="w-full h-full flex align-middle items-center justify-center">
         <div className="mx-auto">
           <ChessBoard roomID={roomID} clientID={clientID} turn={turn} onTurnUpdate={handleTurnUpdate}></ChessBoard>

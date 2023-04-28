@@ -23,10 +23,11 @@ const PlayForm = () => {
   }
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="bg-white rounded-lg shadow-md p-6 flex flex-col items-center">
+      <div className="bg-white dark:bg-[#555759] rounded-lg shadow-md p-6 flex flex-col items-center 
+        sm:w-1/2 md:w-2/3 lg:w-1/2 xl:w-1/3">
         <button
           onClick={handleNewRoomClick}
-          className="w-full sm:w-auto bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4"
+          className="block w-full rounded border w-full sm:w-auto bg-[#CE3262] border-[#CE3262] hover:bg-[#c9426d] border-[#c9426d] text-white font-bold py-2 px-4 rounded mb-4"
         >
           Create Room
         </button>
@@ -38,10 +39,10 @@ const PlayForm = () => {
               id="roomCode"
               value={roomCode}
               onChange={handleRoomCodeChange}
-              className={`border ${error ? 'bg-red-200' : 'border-gray-300'} px-3 py-2 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-600`}/>
+              className={`border ${error ? 'bg-red-200' : 'border-gray-300'} px-3 py-2 rounded-md w-full text-sm focus:outline-none focus:ring-2 focus:ring-[#00A29C]`}/>
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ml-2"
+              className="block w-full rounded border border-[#00A29C] bg-[#00A29C] hover:bg-[#3ba8a4] text-white font-bold py-1 px-4 rounded ml-2"
             >
               Join 
             </button>
