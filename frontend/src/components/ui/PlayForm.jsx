@@ -23,7 +23,7 @@ const PlayForm = () => {
   }
   return (
     <div className="flex items-center justify-center h-screen">
-      <div className="bg-white dark:bg-[#555759] rounded-lg shadow-md p-6 flex flex-col items-center 
+      <div className="bg-[#DBD9D6] dark:bg-[#555759] rounded-lg shadow-md p-6 flex flex-col items-center 
         sm:w-1/2 md:w-2/3 lg:w-1/2 xl:w-1/3">
         <button
           onClick={handleNewRoomClick}

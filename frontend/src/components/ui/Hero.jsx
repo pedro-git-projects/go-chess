@@ -17,20 +17,20 @@ const Hero = () => {
             <span className="sm:block"> Have fun with your friends. </span>
           </h1>
 
-          <p className="mx-auto mt-4 max-w-xl sm:text-xl/relaxed">
+          <p className="text-[#5A5A5A] dark:text-white mx-auto mt-4 max-w-xl sm:text-xl/relaxed">
             <b>Go Chess</b> is a free online chess game powered by <b>Go</b> and <b>React</b>. 
           </p>
 
           <div className="mt-8 flex flex-wrap justify-center gap-4">
             <button
-              className="block w-full rounded border border-[#00A29C] bg-[#00A29C] px-12 py-3 text-sm font-medium text-white hover:bg-transparent hover:text-white focus:outline-none focus:ring active:text-opacity-75 sm:w-auto"
+              className="block w-full rounded border border-[#00A29C] bg-[#00A29C] px-12 py-3 text-sm font-medium text-white dark:hover:bg-transparent hover:text-white focus:outline-none focus:ring active:text-opacity-75 sm:w-auto"
               onClick={handleClickPlay} 
             >
               Go Play 
             </button>
 
             <button
-              className="block w-full rounded border border-blue-600 px-12 py-3 text-sm font-medium text-white hover:bg-blue-600 focus:outline-none focus:ring active:bg-blue-500 sm:w-auto"
+              className="block w-full rounded border dark:border-blue-600 bg-blue-600 dark:bg-transparent px-12 py-3 text-sm font-medium text-white hover:bg-blue-600 dark:hover:bg-blue-600  focus:outline-none focus:ring active:bg-blue-500 sm:w-auto"
               onClick={handleClickLearn}
             >
               Go Learn

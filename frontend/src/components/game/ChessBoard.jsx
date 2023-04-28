@@ -39,7 +39,7 @@ const renderSquare = ({roomID, clientID}, colIndex, rowIndex, boardState, setBoa
   const coordinate = `${String.fromCharCode(104 - colIndex)}${rowIndex + 1}`  
   const square =  boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
-  const backgroundColor = isEvenSquare ? "bg-gray-400" : "bg-white"
+  const backgroundColor = isEvenSquare ? "bg-[#93AFC0]" : "bg-[#DDE6EB]"
   const ws = useWebSocket()
   const handleClick = async () => {
     console.log(coordinate)
