@@ -1,4 +1,16 @@
-# Go Chess - A Chess Website Powered by Go and React 
+# Go Chess - A Chess Website Powered by Go and React
+
+### Table of Contents
+
+  * [About](#about)
+  * [Features](#features)
+  * [Technologies](#technologies)
+  * [Requirements](#requirements)
+  * [Installation](#installation)
+  * [Running the application](#running-the-application)
+  * [Usage](#usage)
+
+---
 
 ## About 
 
