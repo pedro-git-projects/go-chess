@@ -53,24 +53,6 @@ const renderSquare = ({roomID, clientID}, colIndex, rowIndex, boardState, setBoa
       return { ...square, highlighted: false }
     }))
   }
-  const handleDragStart = (event, coordinate) => {
-    event.preventDefault()
-    setDraggingFrom(coordinate)
-  }
-  const handleDragOver = (event, coordinate) => {
-    event.preventDefault()
-    setDroppingTo(coordinate)
-  }
-  const handleDrop = async (event, coordinate) => {
-    event.preventDefault()
-    if (draggingFrom && droppingTo) {
-      const msg = JSON.stringify({ message: "move", room_id: roomID, from: draggingFrom, to: droppingTo, client_id: clientID })
-      const resp = await sendMessage(ws, msg)
-      console.log("response received:", resp)
-    }
-    setDraggingFrom(null)
-    setDroppingTo(null)
-  }
   return (
     <div
       key={`${colIndex}${rowIndex}`}
@@ -151,20 +133,6 @@ const ChessBoard = ({roomID, clientID, turn, onTurnUpdate}) => {
       ws.removeEventListener('message', handleMessage)
     }
   }, [boardState, latestMove, ws])
-
-  const handleDrop = async (event, coordinate) => {
-    event.preventDefault()
-    if (draggingFrom && droppingTo) {
-      const from = draggingFrom
-      const to = droppingTo
-      setLatestMove({from, to}) // updated latest move
-      const msg = JSON.stringify({ message: "move", room_id: roomID, client_id: clientID, from, to })
-      const resp = await sendMessage(ws, msg)
-      console.log("response received:", resp)
-    }
-    setDraggingFrom(null)
-    setDroppingTo(null)
-  }  
   return renderBoard({roomID, clientID}, boardState, setBoardState)
 }
 
