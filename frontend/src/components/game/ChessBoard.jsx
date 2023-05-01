@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useWebSocket } from "../../contexts/WebSocketContext"
 import whitePawn from "../../assets/white_pawn.svg"
 import blackPawn from "../../assets/black_pawn.svg"
 import whiteKnight from "../../assets/white_horse.svg"
@@ -12,7 +13,6 @@ import blackQueen from "../../assets/black_queen.svg"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
 import sendMessage from "../../hooks/sendMessage"
-import { useWebSocket } from "../../contexts/WebSocketContext"
 
 const getPieceSymbol = (piece) => {
   const [color, type] = piece.split(" ")

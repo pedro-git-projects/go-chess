@@ -98,7 +98,7 @@ func (q *Queen) CalculateLegalMoves(board board) {
 			break
 		}
 		l = append(l, right)
-		right, ok = board.NLeft(right, 1)
+		right, ok = board.NRight(right, 1)
 	}
 
 	// foward left diagonal
