@@ -34,7 +34,7 @@ const getPieceSymbol = (piece) => {
 }
 
 const renderSquare = (
-  { roomID, clientID },
+  { roomID, clientID, clientColor },
   colIndex,
   rowIndex,
   boardState,
@@ -105,7 +105,7 @@ const renderSquare = (
 }
 
 const renderRow = (
-  { roomID, clientID },
+  { roomID, clientID, clientColor },
   rowIndex,
   boardState,
   setBoardState,
@@ -115,7 +115,7 @@ const renderRow = (
       .reverse()
       .map((colIndex) =>
         renderSquare(
-          { roomID, clientID },
+          { roomID, clientID, clientColor },
           colIndex,
           rowIndex,
           boardState,
@@ -125,17 +125,17 @@ const renderRow = (
   </div>
 )
 
-const renderBoard = ({ roomID, clientID }, boardState, setBoardState) => (
+const renderBoard = ({ roomID, clientID, clientColor }, boardState, setBoardState) => (
   <div>
     {Array.from(Array(8).keys())
       .reverse()
       .map((rowIndex) =>
-        renderRow({ roomID, clientID }, rowIndex, boardState, setBoardState),
+        renderRow({ roomID, clientID, clientColor }, rowIndex, boardState, setBoardState),
       )}
   </div>
 )
 
-const ChessBoard = ({ roomID, clientID, turn, onTurnUpdate }) => {
+const ChessBoard = ({ roomID, clientID, clientColor, turn, onTurnUpdate }) => {
   const [boardState, setBoardState] = useState([])
   const [latestMove, setLatestMove] = useState(null)
   const ws = useWebSocket()
@@ -182,7 +182,7 @@ const ChessBoard = ({ roomID, clientID, turn, onTurnUpdate }) => {
       ws.removeEventListener("message", handleMessage)
     }
   }, [boardState, latestMove, ws])
-  return renderBoard({ roomID, clientID }, boardState, setBoardState)
+  return renderBoard({ roomID, clientID, clientColor }, boardState, setBoardState)
 }
 
 export default ChessBoard
