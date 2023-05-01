@@ -92,7 +92,7 @@ const renderSquare = ({roomID, clientID}, colIndex, rowIndex, boardState, setBoa
       {square && square.piece !== "empty" && getPieceSymbol(square.piece)}
       {square?.highlighted && (
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-2 h-2 rounded-full bg-zinc-900"></div>
+          <div className={`w-full h-full bg-yellow-300 opacity-50`}></div>
         </div>
       )}
     </div>  
