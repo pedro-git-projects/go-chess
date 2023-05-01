@@ -30,33 +30,50 @@ const getPieceSymbol = (piece) => {
     "white-king": whiteKing,
     "black-king": blackKing,
   }[`${color}-${type}`]
-  return <img src={svg} alt={type}/>
+  return <img src={svg} alt={type} />
 }
 
-const renderSquare = ({roomID, clientID}, colIndex, rowIndex, boardState, setBoardState) => {
-  const [draggingFrom, setDraggingFrom] = useState(null)
-  const [droppingTo, setDroppingTo] = useState(null)
-  const coordinate = `${String.fromCharCode(104 - colIndex)}${rowIndex + 1}`  
-  const square =  boardState.find((square) => square.coordinate === coordinate)
+const renderSquare = (
+  { roomID, clientID },
+  colIndex,
+  rowIndex,
+  boardState,
+  setBoardState,
+) => {
+  const coordinate = `${String.fromCharCode(104 - colIndex)}${rowIndex + 1}`
+  const square = boardState.find((square) => square.coordinate === coordinate)
   const isEvenSquare = (colIndex + rowIndex) % 2 === 0
   const backgroundColor = isEvenSquare ? "bg-[#93AFC0]" : "bg-[#DDE6EB]"
   const ws = useWebSocket()
   const handleClick = async () => {
     console.log(coordinate)
-    const msg = JSON.stringify({message:"calc",coordinate: coordinate, room_id:roomID, client_id: clientID})
+    const msg = JSON.stringify({
+      message: "calc",
+      coordinate: coordinate,
+      room_id: roomID,
+      client_id: clientID,
+    })
     const resp = await sendMessage(ws, msg)
-    console.log("response received:", resp)      
-    setBoardState(boardState.map((square) => {
-      if (JSON.parse(resp.legal_movements).some((d) => d.coordinate === square.coordinate)) {          
-        return { ...square, highlighted: true }
-      }
-      return { ...square, highlighted: false }
-    }))
+    console.log("response received:", resp)
+    setBoardState(
+      boardState.map((square) => {
+        if (
+          JSON.parse(resp.legal_movements).some(
+            (d) => d.coordinate === square.coordinate,
+          )
+        ) {
+          return { ...square, highlighted: true }
+        }
+        return { ...square, highlighted: false }
+      }),
+    )
   }
   return (
     <div
       key={`${colIndex}${rowIndex}`}
-      className={`w-16 h-16 flex items-center justify-center ${backgroundColor} ${square?.highlighted ? 'relative' : ''}`}
+      className={`w-16 h-16 flex items-center justify-center ${backgroundColor} ${
+        square?.highlighted ? "relative" : ""
+      }`}
       onClick={handleClick}
       onDragStart={(e) => {
         e.dataTransfer.setData("text/plain", coordinate)
@@ -67,7 +84,13 @@ const renderSquare = ({roomID, clientID}, colIndex, rowIndex, boardState, setBoa
       onDrop={(e) => {
         const from = e.dataTransfer.getData("text/plain")
         const to = coordinate
-        const msg = JSON.stringify({message: "move", room_id: roomID, from: from, to: to, client_id: clientID})
+        const msg = JSON.stringify({
+          message: "move",
+          room_id: roomID,
+          from: from,
+          to: to,
+          client_id: clientID,
+        })
         sendMessage(ws, msg)
       }}
     >
@@ -77,30 +100,53 @@ const renderSquare = ({roomID, clientID}, colIndex, rowIndex, boardState, setBoa
           <div className={`w-full h-full bg-yellow-300 opacity-50`}></div>
         </div>
       )}
-    </div>  
+    </div>
   )
 }
 
-const renderRow = ({roomID, clientID}, rowIndex, boardState, setBoardState) => (
+const renderRow = (
+  { roomID, clientID },
+  rowIndex,
+  boardState,
+  setBoardState,
+) => (
   <div key={`row${rowIndex}`} className="flex flex-row">
-    { Array.from(Array(8).keys()).reverse().map((colIndex) => renderSquare({roomID, clientID}, colIndex, rowIndex, boardState, setBoardState)) }
+    {Array.from(Array(8).keys())
+      .reverse()
+      .map((colIndex) =>
+        renderSquare(
+          { roomID, clientID },
+          colIndex,
+          rowIndex,
+          boardState,
+          setBoardState,
+        ),
+      )}
   </div>
 )
 
-const renderBoard = ({roomID, clientID}, boardState, setBoardState) => (
+const renderBoard = ({ roomID, clientID }, boardState, setBoardState) => (
   <div>
-    { Array.from(Array(8).keys()).reverse().map((rowIndex) => renderRow({roomID, clientID}, rowIndex, boardState, setBoardState)) }  
+    {Array.from(Array(8).keys())
+      .reverse()
+      .map((rowIndex) =>
+        renderRow({ roomID, clientID }, rowIndex, boardState, setBoardState),
+      )}
   </div>
 )
 
-const ChessBoard = ({roomID, clientID, turn, onTurnUpdate}) => {
+const ChessBoard = ({ roomID, clientID, turn, onTurnUpdate }) => {
   const [boardState, setBoardState] = useState([])
-  const [latestMove, setLatestMove] = useState(null) 
+  const [latestMove, setLatestMove] = useState(null)
   const ws = useWebSocket()
 
   useEffect(() => {
     const fetchBoardState = async () => {
-      const msg = JSON.stringify({message:"render", room_id:roomID, client_id:clientID})
+      const msg = JSON.stringify({
+        message: "render",
+        room_id: roomID,
+        client_id: clientID,
+      })
       const resp = await sendMessage(ws, msg)
       console.log("response received:", resp)
       setBoardState(JSON.parse(resp.state))
@@ -122,18 +168,23 @@ const ChessBoard = ({roomID, clientID, turn, onTurnUpdate}) => {
           }
         })
         setBoardState(newBoardState)
-      } else if (data.state && data.from === latestMove?.from && data.to === latestMove?.to) { // updated condition
+      } else if (
+        data.state &&
+        data.from === latestMove?.from &&
+        data.to === latestMove?.to
+      ) {
+        // updated condition
         setBoardState(JSON.parse(data.state))
-        onTurnUpdate(data.turn || JSON.parse(data.turn)) 
+        onTurnUpdate(data.turn || JSON.parse(data.turn))
         setLatestMove(null)
       }
     }
-    ws.addEventListener('message', handleMessage)
+    ws.addEventListener("message", handleMessage)
     return () => {
-      ws.removeEventListener('message', handleMessage)
+      ws.removeEventListener("message", handleMessage)
     }
   }, [boardState, latestMove, ws])
-  return renderBoard({roomID, clientID}, boardState, setBoardState)
+  return renderBoard({ roomID, clientID }, boardState, setBoardState)
 }
 
 export default ChessBoard
