@@ -1,4 +1,4 @@
-const connectToWS = (url) => 
+const connectToWS = (url) =>
   new Promise((resolve, reject) => {
     const ws = new WebSocket(url)
     ws.onopen = () => {

@@ -1,28 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState } from "react"
 
 function SignInForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
   const handleEmailChange = (e) => {
-    setEmail(e.target.value);
-  };
+    setEmail(e.target.value)
+  }
 
   const handlePasswordChange = (e) => {
-    setPassword(e.target.value);
-  };
+    setPassword(e.target.value)
+  }
 
   const handleSubmit = (e) => {
-    e.preventDefault();
+    e.preventDefault()
     // Submit form data to server or perform other actions
-  };
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
       <div className="w-full max-w-md">
-        <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+        >
           <div className="mb-8">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="email">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -35,7 +41,10 @@ function SignInForm() {
             />
           </div>
           <div className="mb-8">
-            <label className="block text-gray-700 font-bold mb-2" htmlFor="password">
+            <label
+              className="block text-gray-700 font-bold mb-2"
+              htmlFor="password"
+            >
               Password
             </label>
             <input
@@ -58,7 +67,7 @@ function SignInForm() {
         </form>
       </div>
     </div>
-  );
+  )
 }
 
-export default SignInForm;
+export default SignInForm

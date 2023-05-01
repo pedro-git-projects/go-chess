@@ -154,7 +154,6 @@ const ChessBoard = ({ roomID, clientID, turn, onTurnUpdate }) => {
     fetchBoardState()
   }, [])
 
-  // Listen to WebSocket messages and update boardState
   useEffect(() => {
     const handleMessage = (event) => {
       const data = JSON.parse(event.data)
@@ -173,7 +172,6 @@ const ChessBoard = ({ roomID, clientID, turn, onTurnUpdate }) => {
         data.from === latestMove?.from &&
         data.to === latestMove?.to
       ) {
-        // updated condition
         setBoardState(JSON.parse(data.state))
         onTurnUpdate(data.turn || JSON.parse(data.turn))
         setLatestMove(null)
