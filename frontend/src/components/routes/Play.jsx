@@ -1,10 +1,10 @@
 import { Layout } from "../ui/Layout"
 import PlayForm from "../ui/PlayForm"
 
-const Play = () => ( 
+const Play = () => (
   <Layout>
-      <PlayForm/>
+    <PlayForm />
   </Layout>
 )
 
-export default Play 
+export default Play

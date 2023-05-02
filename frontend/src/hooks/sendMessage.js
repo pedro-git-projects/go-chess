@@ -1,4 +1,4 @@
-const sendMessage = (ws, message) => 
+const sendMessage = (ws, message) =>
   new Promise((resolve, reject) => {
     if (ws.readyState === WebSocket.OPEN) {
       ws.onmessage = (e) => {
@@ -12,6 +12,5 @@ const sendMessage = (ws, message) =>
       reject(new Error("WebSocket connection is not open."))
     }
   })
-
 
 export default sendMessage
