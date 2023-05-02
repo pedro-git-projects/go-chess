@@ -5,6 +5,7 @@ import { WebsocketProvider } from "./contexts/WebSocketContext"
 import Err from "./components/routes/Err"
 import Learn from "./components/routes/Learn"
 import Play from "./components/routes/Play"
+import Post from "./components/routes/Post"
 import Room from "./components/routes/Room"
 import Root from "./components/routes/Root"
 import SignIn from "./components/routes/Signin"
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
   {
     path: "/room/:clientID",
     element: <Room />,
+  },
+  {
+    path: "posts/:id",
+    element: <Post />,
   },
 ])
 

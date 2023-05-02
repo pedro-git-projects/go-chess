@@ -7,18 +7,15 @@ import (
 )
 
 type Post struct {
-	ID    int    `json:"id"`
-	Title string `json:"title"`
-	Body  string `json:"body"`
-	// Image []string `json:"images"`
+	ID      int    `json:"id"`
+	Title   string `json:"title"`
+	Body    string `json:"body"`
+	Image   string `json:"image"`
+	Content string `json:"content"`
 }
 
 func getPosts(w http.ResponseWriter, r *http.Request) {
-	posts := []Post{
-		{ID: 1, Title: "First Post", Body: "Lorem ipsum dolor sit amet"},
-		{ID: 2, Title: "Second Post", Body: "Consectetur adipiscing elit"},
-		{ID: 3, Title: "Third Post", Body: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua"},
-	}
+	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(posts)
 }
 
@@ -28,7 +25,12 @@ func getPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid post ID", http.StatusBadRequest)
 		return
 	}
-	post := Post{ID: id, Title: "Sample Post", Body: "This is a sample post"}
+	p := Post{}
+	for _, post := range posts {
+		if post.ID == id {
+			p = post
+		}
+	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(post)
+	json.NewEncoder(w).Encode(p)
 }

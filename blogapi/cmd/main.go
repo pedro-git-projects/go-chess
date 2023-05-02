@@ -10,7 +10,10 @@ import (
 )
 
 func main() {
-	handler := cors.AllowAll().Handler(routes())
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"http://localhost:5173"},
+	})
+	handler := c.Handler(routes())
 
 	srv := &http.Server{
 		Addr:         ":1337",
