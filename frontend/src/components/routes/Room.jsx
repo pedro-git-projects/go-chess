@@ -13,7 +13,6 @@ const Room = () => {
   const roomID = location.state?.roomID || ""
   const clientID = location.state?.clientID || ""
   const clientColor = location.state?.clientColor || ""
-  console.log(clientColor)
   const [turn, setTurn] = useState(location.state?.turn || "white")
   const ws = useWebSocket()
   useEffect(() => {
