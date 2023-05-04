@@ -90,13 +90,6 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 		// add client to room
 		s.addClientToRoom(roomID, clientID, ws)
 
-		// broadcast to all clients
-		msg := RoomUpdateResponse{
-			Type:                  "room-update",
-			NumberOfClientsInRoom: len(s.clientsInRoom[roomID]),
-		}
-		s.messageRoom(roomID, msg)
-
 		s.table.SetGame(roomID, gameState)
 		turn := gameState.CurrentTurn().String()
 		clientColor := gameState.ClientFromID(clientID).Color()
@@ -113,6 +106,14 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
+
+		// broadcast to all clients
+		msg := RoomUpdateResponse{
+			Type:                  "room-update",
+			NumberOfClientsInRoom: len(s.clientsInRoom[roomID]),
+		}
+		s.messageRoom(roomID, msg)
+
 	} else {
 		resp := JoinRoomResponse{
 			RoomID:      "",

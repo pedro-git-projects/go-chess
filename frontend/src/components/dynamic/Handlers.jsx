@@ -12,6 +12,7 @@ export const handleJoinRoom = async (
     const resp = await sendMessage(ws, message)
     console.log("response received:", resp)
     setResponse(resp)
+    console.log("Join room response: ", resp)
     if (resp.room_id === "") {
       setError(resp.error)
     } else {
