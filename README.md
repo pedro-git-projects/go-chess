@@ -58,13 +58,19 @@ make install
 
 ## Running the application
 
-1. Start the backend server
+1. Start the backend chess server
 
 ```bash
-make run
+make run-chess
 ```
 
-2. Start the frontend server
+2. Start the backend blog server
+
+```bash
+make run-blog
+```
+
+3. Start the frontend server
 
 ```bash
 make dev
