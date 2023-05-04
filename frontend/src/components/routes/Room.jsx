@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { useWebSocket } from "../../contexts/WebSocketContext"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
-
+import { handleUpdateRoom } from "../dynamic/Handlers"
 
 const Room = () => {
   const location = useLocation()
@@ -13,14 +13,19 @@ const Room = () => {
   const roomID = location.state?.roomID || ""
   const clientID = location.state?.clientID || ""
   const clientColor = location.state?.clientColor || ""
-  const clientsInRoom = location.state?.clientsInRoom || ""
   const [turn, setTurn] = useState(location.state?.turn || "white")
+  const [numberOfClientsInRoom, setNumberOfClientsInRoom] = useState(location.state?.numberOfClientsInRoom || 1)
   const ws = useWebSocket()
+
   useEffect(() => {
     if (!roomID) {
       navigate("/play")
     }
-  }, [roomID, navigate])
+    handleUpdateRoom(ws, (numberOfClientsInRoom) => {
+      setNumberOfClientsInRoom(numberOfClientsInRoom)
+    })
+  }, [roomID, navigate, ws])
+
   const handleTurnUpdate = (newTurn) => {
     setTurn(newTurn)
   }
@@ -29,6 +34,7 @@ const Room = () => {
   }
   return (
     <Layout>
+      <h1>{numberOfClientsInRoom}</h1>
       {turn === clientColor ? (
         <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">Your turn</h2>
       ) : (
