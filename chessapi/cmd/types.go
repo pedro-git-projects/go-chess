@@ -11,17 +11,23 @@ type CreateRoomResponse struct {
 	Turn        string `json:"turn"`
 }
 
+type RoomUpdateResponse struct {
+	Type                  string `json:"type"`
+	NumberOfClientsInRoom int    `json:"number_of_clients_in_room"`
+}
+
 type JoinRoomRequest struct {
 	Message string `json:"message"`
 	RoomID  string `json:"room_id"`
 }
 
 type JoinRoomResponse struct {
-	RoomID      string `json:"room_id"`
-	ClientID    string `json:"client_id"`
-	Turn        string `json:"turn"`
-	ClientColor string `json:"client_color"`
-	Error       string `json:"error"`
+	RoomID                string `json:"room_id"`
+	ClientID              string `json:"client_id"`
+	Turn                  string `json:"turn"`
+	ClientColor           string `json:"client_color"`
+	NumberOfClientsInRoom int    `json:"number_of_clients_in_room"`
+	Error                 string `json:"error"`
 }
 
 type RenderBoardRequest struct {

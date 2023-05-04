@@ -104,3 +104,13 @@ func (g *Game) ClientFromID(clientID string) *Client {
 	}
 	return nil
 }
+
+func (g *Game) ClientsInRoom() (clients []string) {
+	if g.client1 != nil && g.client1.id != "" {
+		clients = append(clients, g.client1.id)
+	}
+	if g.client2 != nil && g.client2.id != "" {
+		clients = append(clients, g.client2.id)
+	}
+	return
+}

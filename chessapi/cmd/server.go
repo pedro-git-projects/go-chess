@@ -89,21 +89,31 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 		}
 		// add client to room
 		s.addClientToRoom(roomID, clientID, ws)
+
 		s.table.SetGame(roomID, gameState)
 		turn := gameState.CurrentTurn().String()
 		clientColor := gameState.ClientFromID(clientID).Color()
 		resp := JoinRoomResponse{
-			RoomID:      roomID,
-			ClientID:    clientID,
-			Turn:        turn,
-			ClientColor: clientColor.String(),
-			Error:       "",
+			RoomID:                roomID,
+			ClientID:              clientID,
+			Turn:                  turn,
+			ClientColor:           clientColor.String(),
+			NumberOfClientsInRoom: len(s.clientsInRoom[roomID]),
+			Error:                 "",
 		}
 		fmt.Println("Sending response: ")
 		err = websocket.JSON.Send(ws, resp)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "error sending response: %s\n", err)
 		}
+
+		// broadcast to all clients
+		msg := RoomUpdateResponse{
+			Type:                  "room-update",
+			NumberOfClientsInRoom: len(s.clientsInRoom[roomID]),
+		}
+		s.messageRoom(roomID, msg)
+
 	} else {
 		resp := JoinRoomResponse{
 			RoomID:      "",
