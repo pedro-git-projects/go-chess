@@ -6,6 +6,7 @@ import { useWebSocket } from "../../contexts/WebSocketContext"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
 import { handleUpdateRoom } from "../dynamic/Handlers"
+import CopyToClipboard from "../ui/CopyToClipboard" 
 
 const Room = () => {
   const location = useLocation()
@@ -32,9 +33,22 @@ const Room = () => {
   if (!roomID || !ws) {
     return null
   }
+  if (numberOfClientsInRoom < 2) {
+    return(
+      <Layout>
+        <div className="min-h-screen flex justify-center items-center bg-gray-100">
+          <div className="text-center max-w-md w-full bg-white shadow-md rounded-lg p-8">
+            <p className="mb-4">Waiting for another player to join...</p>
+            <p className="mb-4">Send them the room code!</p>
+            <div className="relative">
+              <CopyToClipboard className="w-full" />
+            </div>
+          </div>
+        </div>      </Layout>    
+    )
+  }
   return (
     <Layout>
-      <h1>{numberOfClientsInRoom}</h1>
       {turn === clientColor ? (
         <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">Your turn</h2>
       ) : (
