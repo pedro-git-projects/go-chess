@@ -15,9 +15,8 @@ export const handleJoinRoom = async (
     if (resp.room_id === "") {
       setError(resp.error)
     } else {
-      console.log("clientID: ", resp.client_id)
       navigate(`/room/${resp.room_id}`, {
-        state: { roomID: resp.room_id, clientID: resp.client_id, clientColor: resp.client_color },
+        state: { roomID: resp.room_id, clientID: resp.client_id, clientColor: resp.client_color, clientsInRoom: resp.clients_in_room },
       })
     }
   } catch (err) {
@@ -30,10 +29,8 @@ export const handleCreateRoom = async (ws, navigate, setResponse) => {
     const message = JSON.stringify({ message: "create" })
     const resp = await sendMessage(ws, message)
     setResponse(resp)
-    console.log(resp)
-    console.log("clientID: ", resp.client_id)
     navigate(`/room/${resp.room_id}`, {
-      state: { roomID: resp.room_id, clientID: resp.client_id, clientColor: resp.client_color },
+      state: { roomID: resp.room_id, clientID: resp.client_id, clientColor: resp.client_color, clientsInRoom: resp.clients_in_room },
     })
   } catch (err) {
     console.log("Error: ", err)
