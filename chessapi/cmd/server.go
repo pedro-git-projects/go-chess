@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"sync"
@@ -258,8 +259,9 @@ func (s *GameServer) gameLoop(ws *websocket.Conn) {
 	for {
 		r := new(BoardRequest)
 		err := websocket.JSON.Receive(ws, r)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "board::error 1 receiving message: %s\n", err)
+		if err != nil && err == io.EOF {
+			fmt.Fprintf(os.Stderr, "board -> error receiving message: %s\n", err)
+			// TODO deal with disconnect
 			return
 		}
 		fmt.Println(r.Message)
