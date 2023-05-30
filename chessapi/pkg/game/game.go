@@ -43,6 +43,15 @@ func (g *Game) AddClient(c *Client) error {
 	return errors.New("Game is full")
 }
 
+func (g *Game) RemoveClient(clientID string) {
+	if g.client1 != nil && g.client1.id == clientID {
+		g.client1 = nil
+	}
+	if g.client2 != nil && g.client2.id == clientID {
+		g.client2 = nil
+	}
+}
+
 func (game *Game) PieceColor(c utils.Coordinate) piece.Color {
 	return game.board.PieceAt(c).Color()
 }

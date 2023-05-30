@@ -2,7 +2,9 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"sync"
@@ -15,6 +17,7 @@ import (
 type GameServer struct {
 	table         *game.Table
 	clientsInRoom map[string]map[string]*websocket.Conn // roomID -> clientID -> ws
+	wsToClient    map[*websocket.Conn]clientInfo        // ws -> roomID/clientID/color
 	mu            sync.RWMutex
 }
 
@@ -22,6 +25,7 @@ func NewServer() *GameServer {
 	return &GameServer{
 		table:         game.NewTable(),
 		clientsInRoom: make(map[string]map[string]*websocket.Conn),
+		wsToClient:    make(map[*websocket.Conn]clientInfo),
 	}
 }
 
@@ -39,6 +43,7 @@ func (s *GameServer) handleCreateRoom(ws *websocket.Conn, r *BoardRequest) {
 	// add client to room
 	s.addClientToRoom(roomID, clientID, ws)
 	clientColor := s.table.Game(roomID).ClientFromID(clientID).Color().String()
+	s.addClientInfoToMap(ws, roomID, clientID, clientColor)
 	turn := "white"
 	resp := CreateRoomResponse{
 		RoomID:      roomID,
@@ -93,6 +98,7 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 		s.table.SetGame(roomID, gameState)
 		turn := gameState.CurrentTurn().String()
 		clientColor := gameState.ClientFromID(clientID).Color()
+		s.addClientInfoToMap(ws, roomID, clientID, clientColor.String())
 		resp := JoinRoomResponse{
 			RoomID:                roomID,
 			ClientID:              clientID,
@@ -101,6 +107,7 @@ func (s *GameServer) handleJoinRoom(ws *websocket.Conn, r *BoardRequest) {
 			NumberOfClientsInRoom: len(s.clientsInRoom[roomID]),
 			Error:                 "",
 		}
+		fmt.Println("JOIN NUMBER OF CLIENTS IN ROOM: ", len(s.clientsInRoom[roomID]))
 		fmt.Println("Sending response: ")
 		err = websocket.JSON.Send(ws, resp)
 		if err != nil {
@@ -255,11 +262,19 @@ func (s *GameServer) handleMovePiece(ws *websocket.Conn, r *BoardRequest) {
 }
 
 func (s *GameServer) gameLoop(ws *websocket.Conn) {
+	defer ws.Close()
 	for {
 		r := new(BoardRequest)
 		err := websocket.JSON.Receive(ws, r)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "board::error 1 receiving message: %s\n", err)
+		if err != nil && err == io.EOF {
+			fmt.Fprintf(os.Stderr, "board -> error receiving message: %s\n", err)
+			info, err := s.getClientInfo(ws)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "board -> internal error: %s\n", err)
+			}
+			fmt.Printf("room ID: %s\tclient ID: %s\n", info.roomID, info.clientID)
+			s.removeClientFromRoom(info.roomID, info.clientID)    // remove client from room
+			s.table.Game(info.roomID).RemoveClient(info.clientID) // remove client from game
 			return
 		}
 		fmt.Println(r.Message)
@@ -333,6 +348,18 @@ func (s *GameServer) addClientToRoom(roomID, clientID string, conn *websocket.Co
 	s.clientsInRoom[roomID][clientID] = conn
 }
 
+func (s *GameServer) addClientInfoToMap(ws *websocket.Conn, roomID, clientID, color string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	ci := clientInfo{
+		roomID:      roomID,
+		clientID:    clientID,
+		clientColor: color,
+	}
+	s.wsToClient[ws] = ci
+}
+
 // setClientConnection updates the connection in the map
 func (s *GameServer) setClientConnection(roomID, clientID string, conn *websocket.Conn) {
 	s.mu.Lock()
@@ -354,4 +381,14 @@ func (s *GameServer) removeClientFromRoom(roomID, clientID string) {
 			delete(s.clientsInRoom, roomID)
 		}
 	}
+}
+
+func (s *GameServer) getClientInfo(ws *websocket.Conn) (clientInfo, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	info, ok := s.wsToClient[ws]
+	if !ok {
+		return clientInfo{}, errors.New("client info does not exist")
+	}
+	return info, nil
 }
