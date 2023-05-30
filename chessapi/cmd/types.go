@@ -1,5 +1,9 @@
 package main
 
+type clientInfo struct {
+	roomID, clientID, clientColor string
+}
+
 type CreateRoomRequest struct {
 	Message string `json:"message"`
 }
