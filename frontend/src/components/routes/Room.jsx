@@ -6,7 +6,7 @@ import { useWebSocket } from "../../contexts/WebSocketContext"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
 import { handleUpdateRoom } from "../dynamic/Handlers"
-import CopyToClipboard from "../ui/CopyToClipboard" 
+import CopyToClipboard from "../ui/CopyToClipboard"
 
 const Room = () => {
   const location = useLocation()
@@ -15,7 +15,9 @@ const Room = () => {
   const clientID = location.state?.clientID || ""
   const clientColor = location.state?.clientColor || ""
   const [turn, setTurn] = useState(location.state?.turn || "white")
-  const [numberOfClientsInRoom, setNumberOfClientsInRoom] = useState(location.state?.numberOfClientsInRoom || 1)
+  const [numberOfClientsInRoom, setNumberOfClientsInRoom] = useState(
+    location.state?.numberOfClientsInRoom || 1,
+  )
   const ws = useWebSocket()
 
   useEffect(() => {
@@ -25,16 +27,30 @@ const Room = () => {
     handleUpdateRoom(ws, (numberOfClientsInRoom) => {
       setNumberOfClientsInRoom(numberOfClientsInRoom)
     })
+
+    const handleBeforeUnload = (event) => {
+      event.preventDefault()
+      event.returnValue = "" // Required for Chrome
+      navigate("/play")
+    }
+
+    window.addEventListener("beforeunload", handleBeforeUnload)
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload)
+    }
   }, [roomID, navigate, ws])
 
   const handleTurnUpdate = (newTurn) => {
     setTurn(newTurn)
   }
+
   if (!roomID || !ws) {
     return null
   }
+
   if (numberOfClientsInRoom < 2) {
-    return(
+    return (
       <Layout>
         <div className="min-h-screen flex justify-center items-center bg-gray-100">
           <div className="text-center max-w-md w-full bg-white shadow-md rounded-lg p-8">
@@ -44,15 +60,20 @@ const Room = () => {
               <CopyToClipboard className="w-full" />
             </div>
           </div>
-        </div>      </Layout>    
+        </div>
+      </Layout>
     )
   }
   return (
     <Layout>
       {turn === clientColor ? (
-        <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">Your turn</h2>
+        <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">
+          Your turn
+        </h2>
       ) : (
-        <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">Opponent's turn</h2>
+        <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">
+          Opponent's turn
+        </h2>
       )}
       <div className="w-full h-full flex align-middle items-center justify-center">
         <div className="mx-auto">
@@ -67,7 +88,11 @@ const Room = () => {
       </div>
       <h2 className="text-black dark:text-white text-3xl font-bold text-center py-3">
         <span className="inline-block mx-2">
-          {clientColor === 'black' ? ( <img src={blackKing} alt="black king"></img>) : ( <img src={whiteKing} alt="white king"></img> )}
+          {clientColor === "black" ? (
+            <img src={blackKing} alt="black king"></img>
+          ) : (
+            <img src={whiteKing} alt="white king"></img>
+          )}
         </span>
         You're playing as {clientColor}
       </h2>
