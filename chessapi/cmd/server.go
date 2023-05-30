@@ -273,8 +273,10 @@ func (s *GameServer) gameLoop(ws *websocket.Conn) {
 				fmt.Fprintf(os.Stderr, "board -> internal error: %s\n", err)
 			}
 			fmt.Printf("room ID: %s\tclient ID: %s\n", info.roomID, info.clientID)
-			s.removeClientFromRoom(info.roomID, info.clientID)    // remove client from room
-			s.table.Game(info.roomID).RemoveClient(info.clientID) // remove client from game
+			s.removeClientFromRoom(info.roomID, info.clientID) // remove client from room
+			if s.table.HasKey(info.roomID) {
+				s.table.Game(info.roomID).RemoveClient(info.clientID) // remove client from game
+			}
 			return
 		}
 		fmt.Println(r.Message)
