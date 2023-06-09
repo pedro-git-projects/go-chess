@@ -14,14 +14,21 @@ type AuthService struct {
 	users      []User
 	sessions   map[string]*User
 	sessionsMu sync.RWMutex
+	db         *Database
 }
 
-func NewAuthService() *AuthService {
+func NewAuthService(db *Database) (*AuthService, error) {
+	users, err := loadUsersFromDB(db)
+	if err != nil {
+		return nil, err
+	}
+
 	return &AuthService{
-		users:      []User{},
+		users:      users,
 		sessions:   make(map[string]*User),
 		sessionsMu: sync.RWMutex{},
-	}
+		db:         db,
+	}, nil
 }
 
 func (a *AuthService) Authenticate(username, password string) bool {
@@ -146,11 +153,18 @@ func HandleRegistration(authService *AuthService) http.HandlerFunc {
 
 // Register creates a new user with the provided username and password
 func (a *AuthService) Register(username, password string) error {
-	// Check if the username already exists
+	// Check if the username already exists in the database
 	for _, user := range a.users {
 		if user.Username == username {
 			return errors.New("Username already exists")
 		}
+	}
+
+	// Insert the new user into the database
+	query := "INSERT INTO users (username, password) VALUES ($1, $2)"
+	_, err := a.db.db.Exec(query, username, password)
+	if err != nil {
+		return err
 	}
 
 	// Create a new user
@@ -159,7 +173,7 @@ func (a *AuthService) Register(username, password string) error {
 		Password: password,
 	}
 
-	// Add the user to the list of users
+	// Add the user to the list of users in memory
 	a.users = append(a.users, newUser)
 
 	return nil
