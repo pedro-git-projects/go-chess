@@ -10,6 +10,7 @@ import (
 	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/token"
 )
 
+// TODO upgrade to HTTPS
 type AuthService struct {
 	users      []User
 	sessions   map[string]*User
@@ -90,14 +91,10 @@ func HandleLogin(authService *AuthService) http.HandlerFunc {
 					http.Error(w, "Failed to start session", http.StatusInternalServerError)
 					return
 				}
-				response := struct {
-					Token string `json:"token"`
-				}{
-					Token: token,
-				}
-				// Return the token in the response
-				w.Header().Set("Content-Type", "application/json")
-				json.NewEncoder(w).Encode(response)
+
+				// Set the token in the response header
+				w.Header().Set("Authorization", token)
+				w.WriteHeader(http.StatusOK)
 				return
 			}
 
@@ -177,4 +174,88 @@ func (a *AuthService) Register(username, password string) error {
 	a.users = append(a.users, newUser)
 
 	return nil
+}
+
+func HandleChangePassword(authService *AuthService) http.HandlerFunc {
+	type ChangePasswordRequest struct {
+		Username    string `json:"username"`
+		OldPassword string `json:"old_password"`
+		NewPassword string `json:"new_password"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			// Read the request body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+				return
+			}
+
+			// Parse the request body into a ChangePasswordRequest struct
+			var changePasswordReq ChangePasswordRequest
+			err = json.Unmarshal(body, &changePasswordReq)
+			if err != nil {
+				http.Error(w, "Invalid request body", http.StatusBadRequest)
+				return
+			}
+
+			// Check if the user is authenticated
+			sessionToken := r.Header.Get("Authorization")
+			if sessionToken == "" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Get the session user from the token
+			sessionUser := authService.GetSessionUser(sessionToken)
+			if sessionUser == nil || sessionUser.Username != changePasswordReq.Username {
+				http.Error(w, "Invalid session", http.StatusUnauthorized)
+				return
+			}
+
+			// Check if the old password matches
+			if sessionUser.Password != changePasswordReq.OldPassword {
+				http.Error(w, "Invalid old password", http.StatusBadRequest)
+				return
+			}
+
+			// Change the user's password
+			err = authService.ChangePassword(changePasswordReq.Username, changePasswordReq.NewPassword)
+			if err != nil {
+				// Password change failed
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// Password change successful
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Return an empty response for GET requests
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+// ChangePassword changes the password of the user with the provided username
+func (a *AuthService) ChangePassword(username, newPassword string) error {
+	// Find the user in the list of users
+	for _, user := range a.users {
+		if user.Username == username {
+			// Update the user's password
+			user.Password = newPassword
+
+			// Update the password in the database
+			query := "UPDATE users SET password = $1 WHERE username = $2"
+			_, err := a.db.db.Exec(query, newPassword, username)
+			if err != nil {
+				return err
+			}
+
+			return nil
+		}
+	}
+
+	return errors.New("User not found")
 }

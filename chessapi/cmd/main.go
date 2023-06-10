@@ -26,6 +26,7 @@ func main() {
 	srv := NewServer()
 	http.HandleFunc("/login", auth.HandleLogin(authService))
 	http.HandleFunc("/register", auth.HandleRegistration(authService))
+	http.HandleFunc("/password/change", auth.HandleChangePassword(authService))
 	http.Handle("/game", websocket.Handler(srv.gameLoop))
 	fmt.Printf("starting server on port %s\n", port)
 	err = http.ListenAndServe(port, nil)
