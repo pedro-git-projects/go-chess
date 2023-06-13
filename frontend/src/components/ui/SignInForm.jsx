@@ -1,4 +1,5 @@
 import { useState, useContext } from "react"
+import { useNavigate } from "react-router-dom"
 import { TokenContext } from "../../contexts/AuthContext"
 import SignUpForm from "./SignUpForm"
 
@@ -7,6 +8,7 @@ const SignInForm = () => {
   const [password, setPassword] = useState("")
   const [usernameError, setUsernameError] = useState("")
   const tokenContext = useContext(TokenContext)
+  const navigate = useNavigate()
   const [showSignUpForm, setShowSignUpForm] = useState(false)
 
   const handleUsernameChange = (e) => {
@@ -46,6 +48,7 @@ const SignInForm = () => {
         const token = response.headers.get("Authorization")
         console.log("Token:", token)
         tokenContext.setToken(token)
+        navigate("/")
       } else {
         const errorText = await response.text()
         console.log("Login failed:", errorText)
