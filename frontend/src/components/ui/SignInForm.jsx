@@ -1,20 +1,55 @@
 import React, { useState } from "react"
 
-function SignInForm() {
-  const [email, setEmail] = useState("")
+const SignInForm = () => {
+  const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [usernameError, setUsernameError] = useState("")
 
-  const handleEmailChange = (e) => {
-    setEmail(e.target.value)
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value)
+    setUsernameError("")
   }
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Submit form data to server or perform other actions
+
+    if (!username) {
+      setUsernameError("Please enter a username")
+      return
+    }
+
+    const loginData = {
+      username,
+      password,
+    }
+
+    try {
+      const response = await fetch("http://localhost:8080/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+      })
+
+	console.log(response)
+
+      if (response.ok) {
+      	console.log("Response Headers:", response.headers)
+        const token = response.headers.get("Authorization")
+        console.log("Token:", token)
+        // Do something with the token (e.g., store it in local storage)
+      } else {
+        const errorText = await response.text()
+        console.log("Login failed:", errorText)
+      }
+    } catch (error) {
+      console.log("An error occurred:", error)
+    }
   }
 
   return (
@@ -27,18 +62,21 @@ function SignInForm() {
           <div className="mb-8">
             <label
               className="block text-gray-700 font-bold mb-2"
-              htmlFor="email"
+              htmlFor="username"
             >
-              Email
+              Username
             </label>
             <input
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="email"
-              type="email"
-              placeholder="Email address"
-              value={email}
-              onChange={handleEmailChange}
+              id="username"
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={handleUsernameChange}
             />
+            {usernameError && (
+              <p className="text-red-500 text-xs italic">{usernameError}</p>
+            )}
           </div>
           <div className="mb-8">
             <label

@@ -11,6 +11,7 @@ import (
 )
 
 // TODO upgrade to HTTPS
+// TODO fix CORS for frotnend
 type AuthService struct {
 	users      []User
 	sessions   map[string]*User

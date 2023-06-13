@@ -24,11 +24,12 @@ func main() {
 	}
 
 	srv := NewServer()
-	http.HandleFunc("/login", auth.HandleLogin(authService))
-	http.HandleFunc("/register", auth.HandleRegistration(authService))
-	http.HandleFunc("/password/change", auth.HandleChangePassword(authService))
+	http.HandleFunc("/login", auth.CorsMiddleware(auth.HandleLogin(authService)))
+	http.HandleFunc("/register", auth.CorsMiddleware(auth.HandleRegistration(authService)))
+	http.HandleFunc("/password/change", auth.CorsMiddleware(auth.HandleChangePassword(authService)))
 	http.Handle("/game", websocket.Handler(srv.gameLoop))
 	fmt.Printf("starting server on port %s\n", port)
+	//	err = http.ListenAndServeTLS(port, "ssl/certs/cert.pem", "ssl/certs/key.pem", nil)
 	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error starting server: %s\n", err)
