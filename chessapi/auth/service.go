@@ -8,10 +8,9 @@ import (
 	"sync"
 
 	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/token"
+	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
 )
 
-// TODO upgrade to HTTPS
-// TODO fix CORS for frotnend
 type AuthService struct {
 	users      []User
 	sessions   map[string]*User
@@ -156,6 +155,12 @@ func (a *AuthService) Register(username, password string) error {
 		if user.Username == username {
 			return errors.New("Username already exists")
 		}
+	}
+
+	// Check for strong password
+	ok, errMsg := utils.IsStrongPassword(password)
+	if !ok {
+		return errors.New(errMsg)
 	}
 
 	// Insert the new user into the database
