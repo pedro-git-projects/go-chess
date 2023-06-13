@@ -1,10 +1,12 @@
-import { useState } from "react"
+import { useState, useContext } from "react"
 import { Link } from "react-router-dom"
+import { TokenContext } from "../../contexts/AuthContext"
 
 import logo from "../../assets/white_king.svg"
 import DarkReducer from "./DarkReducer"
 
 const Header = () => {
+  const { token, resetToken } = useContext(TokenContext)
   const menuItem =
     "relative flex h-full items-center p-4 cursor-pointer font-bold text-white hover:bg-white/10 transition-colors ease-in-out"
   const mobileItem =
@@ -14,6 +16,7 @@ const Header = () => {
     "font-bold text-2xl text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
   const line = `h-1 w-8 my-1 rounded-full bg-white transition ease transform duration-300`
   const [isOpen, setIsOpen] = useState(false)
+
   return (
     <nav className={`flex items-center top-0 ${goGradient}`}>
       <div className="flex items-center p-2 gap-2">
@@ -58,8 +61,8 @@ const Header = () => {
           <Link to={`/learn`} className={`${mobileItem}`}>
             Learn
           </Link>
-          <Link to={`/signin`} className={`${mobileItem}`}>
-            Sign in
+          <Link to={token ? "/" : "/signin"} className={`${mobileItem}`}>
+            {token ? "Sign out" : "Sign in"}
           </Link>
           <DarkReducer className={`${mobileItem}`} />
         </div>
@@ -76,9 +79,15 @@ const Header = () => {
         <Link to={`/learn`} className={`${menuItem}`}>
           Learn
         </Link>
-        <Link to={`/signin`} className={`${menuItem}`}>
-          Sign in
-        </Link>
+        {token ? (
+          <Link to="/" className={`${menuItem}`} onClick={resetToken}>
+            Sign out
+          </Link>
+        ) : (
+          <Link to="/signin" className={`${menuItem}`}>
+            Sign in
+          </Link>
+        )}
         <DarkReducer />
       </div>
     </nav>

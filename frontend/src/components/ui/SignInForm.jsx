@@ -1,10 +1,12 @@
-import React, { useState } from "react"
+import { useState, useContext } from "react"
+import { TokenContext } from "../../contexts/AuthContext"
 
 const SignInForm = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [usernameError, setUsernameError] = useState("")
-
+  const tokenContext = useContext(TokenContext)
+  console.log("Token Context:", tokenContext)
   const handleUsernameChange = (e) => {
     setUsername(e.target.value)
     setUsernameError("")
@@ -36,13 +38,11 @@ const SignInForm = () => {
         body: JSON.stringify(loginData),
       })
 
-	console.log(response)
-
       if (response.ok) {
-      	console.log("Response Headers:", response.headers)
+        console.log("Response Headers:", response.headers)
         const token = response.headers.get("Authorization")
         console.log("Token:", token)
-        // Do something with the token (e.g., store it in local storage)
+        tokenContext.setToken(token)
       } else {
         const errorText = await response.text()
         console.log("Login failed:", errorText)
