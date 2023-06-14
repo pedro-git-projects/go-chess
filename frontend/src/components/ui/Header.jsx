@@ -68,6 +68,11 @@ const Header = () => {
           <Link to={`/learn`} className={`${mobileItem}`}>
             Learn
           </Link>
+		{token && (
+        <Link to={`/account`} className={`${mobileItem}`}>
+          Account
+        </Link>
+    	)}
           {token ? (
             <Link
               to={location.pathname}
@@ -96,6 +101,11 @@ const Header = () => {
         <Link to={`/learn`} className={`${menuItem}`}>
           Learn
         </Link>
+		{token && (
+        <Link to={`/account`} className={`${menuItem}`}>
+          Account
+        </Link>
+    	)}
         {token ? (
           <Link
             to={location.pathname}

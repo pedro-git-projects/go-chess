@@ -11,6 +11,7 @@ import Room from "./components/routes/Room"
 import Root from "./components/routes/Root"
 import SignIn from "./components/routes/Signin"
 import SignUp from "./components/routes/Signup"
+import Account from "./components/routes/Account"
 import "./styles/layout.css"
 
 const router = createBrowserRouter([
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
   {
     path: "posts/:id",
     element: <Post />,
+  },
+  {
+	  path: "/account",
+	  element: <Account/>
   },
 ])
 

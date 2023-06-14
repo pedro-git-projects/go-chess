@@ -13,7 +13,7 @@ import (
 
 type AuthService struct {
 	users      []User
-	sessions   map[string]*User
+	sessions   map[string]*User // authToken user
 	sessionsMu sync.RWMutex
 	db         *Database
 }
@@ -41,7 +41,7 @@ func (a *AuthService) Authenticate(username, password string) bool {
 	return false
 }
 
-func (a *AuthService) StartSession(username string) (authToken string, err error) {
+func (a *AuthService) StartSession(username string, password string) (authToken string, err error) {
 	a.sessionsMu.Lock()
 	defer a.sessionsMu.Unlock()
 
@@ -51,7 +51,7 @@ func (a *AuthService) StartSession(username string) (authToken string, err error
 	}
 
 	// Associate the session token with the user
-	a.sessions[authToken] = &User{Username: username}
+	a.sessions[authToken] = &User{Username: username, Password: password, AuthToken: authToken}
 
 	return authToken, nil
 }
@@ -60,6 +60,18 @@ func (a *AuthService) GetSessionUser(token string) *User {
 	a.sessionsMu.RLock()
 	defer a.sessionsMu.RUnlock()
 	return a.sessions[token]
+}
+
+// GetUsernameFromSessions retrieves the username associated with the session token
+func (a *AuthService) GetUsernameFromSessions(sessionToken string) string {
+	a.sessionsMu.RLock()
+	defer a.sessionsMu.RUnlock()
+	for _, user := range a.sessions {
+		if user.AuthToken == sessionToken {
+			return user.Username
+		}
+	}
+	return ""
 }
 
 func HandleLogin(authService *AuthService) http.HandlerFunc {
@@ -85,7 +97,7 @@ func HandleLogin(authService *AuthService) http.HandlerFunc {
 
 			// Authenticate the user
 			if authService.Authenticate(loginReq.Username, loginReq.Password) {
-				token, err := authService.StartSession(loginReq.Username)
+				token, err := authService.StartSession(loginReq.Username, loginReq.Password)
 				if err != nil {
 					// Internal server error
 					http.Error(w, "Failed to start session", http.StatusInternalServerError)
@@ -184,13 +196,26 @@ func (a *AuthService) Register(username, password string) error {
 
 func HandleChangePassword(authService *AuthService) http.HandlerFunc {
 	type ChangePasswordRequest struct {
-		Username    string `json:"username"`
 		OldPassword string `json:"old_password"`
 		NewPassword string `json:"new_password"`
 	}
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodPost {
+			// Check if the user is authenticated
+			sessionToken := r.Header.Get("Authorization")
+			if sessionToken == "" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Get the session user from the token
+			sessionUser := authService.GetSessionUser(sessionToken)
+			if sessionUser == nil {
+				http.Error(w, "Invalid session", http.StatusUnauthorized)
+				return
+			}
+
 			// Read the request body
 			body, err := ioutil.ReadAll(r.Body)
 			if err != nil {
@@ -206,20 +231,18 @@ func HandleChangePassword(authService *AuthService) http.HandlerFunc {
 				return
 			}
 
-			// Check if the user is authenticated
-			sessionToken := r.Header.Get("Authorization")
-			if sessionToken == "" {
-				http.Error(w, "Unauthorized", http.StatusUnauthorized)
-				return
-			}
-
-			// Get the session user from the token
-			sessionUser := authService.GetSessionUser(sessionToken)
-			if sessionUser == nil || sessionUser.Username != changePasswordReq.Username {
+			// Check if the username matches the session user's username
+			if sessionUser.Username != authService.GetUsernameFromSessions(sessionToken) {
 				http.Error(w, "Invalid session", http.StatusUnauthorized)
 				return
 			}
 
+			// Check for strong password
+			ok, errMsg := utils.IsStrongPassword(changePasswordReq.NewPassword)
+			if !ok {
+				http.Error(w, errMsg, http.StatusForbidden)
+				return
+			}
 			// Check if the old password matches
 			if sessionUser.Password != changePasswordReq.OldPassword {
 				http.Error(w, "Invalid old password", http.StatusBadRequest)
@@ -227,7 +250,7 @@ func HandleChangePassword(authService *AuthService) http.HandlerFunc {
 			}
 
 			// Change the user's password
-			err = authService.ChangePassword(changePasswordReq.Username, changePasswordReq.NewPassword)
+			err = authService.ChangePassword(sessionUser.Username, changePasswordReq.NewPassword)
 			if err != nil {
 				// Password change failed
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -264,4 +287,97 @@ func (a *AuthService) ChangePassword(username, newPassword string) error {
 	}
 
 	return errors.New("User not found")
+}
+
+func HandleDeleteUser(authService *AuthService) http.HandlerFunc {
+	type DeleteUserRequest struct {
+		Password string `json:"password"`
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			// Check if the user is authenticated
+			authToken := r.Header.Get("Authorization")
+			if authToken == "" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Get the session user from the token
+			sessionUser := authService.GetSessionUser(authToken)
+			if sessionUser == nil {
+				http.Error(w, "Invalid session", http.StatusUnauthorized)
+				return
+			}
+
+			// Read the request body
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+				return
+			}
+
+			// Parse the request body into a DeleteUserRequest struct
+			var deleteUserReq DeleteUserRequest
+			err = json.Unmarshal(body, &deleteUserReq)
+			if err != nil {
+				http.Error(w, "Invalid request body", http.StatusBadRequest)
+				return
+			}
+
+			// Verify the user's password
+			if sessionUser.Password != deleteUserReq.Password {
+				http.Error(w, "Invalid password", http.StatusUnauthorized)
+				return
+			}
+
+			// Delete the user
+			err = authService.DeleteUser(sessionUser.Username)
+			if err != nil {
+				// User deletion failed
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+			// User deletion successful
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Return an empty response for GET requests
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+func (a *AuthService) DeleteUser(username string) error {
+	// Find the user index in the list of users
+	userIndex := -1
+	for i, user := range a.users {
+		if user.Username == username {
+			userIndex = i
+			break
+		}
+	}
+
+	// Check if the user exists
+	if userIndex == -1 {
+		return errors.New("User not found")
+	}
+
+	// Delete the user from the list of users
+	a.users = append(a.users[:userIndex], a.users[userIndex+1:]...)
+
+	// Delete the user from the sessions
+	a.sessionsMu.Lock()
+	delete(a.sessions, username)
+	a.sessionsMu.Unlock()
+
+	// Delete the user from the database
+	query := "DELETE FROM users WHERE username = $1"
+	_, err := a.db.db.Exec(query, username)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
