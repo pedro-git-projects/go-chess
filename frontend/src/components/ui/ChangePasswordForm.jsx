@@ -35,7 +35,7 @@ const ChangePasswordForm = () => {
       // Password change successful
       setSuccessMessage("Password changed successfully!") // Set success message
     } catch (error) {
-      setErrorMessage(error.message)
+      setErrorMessage("Couldn't change password")
     }
   }
 
