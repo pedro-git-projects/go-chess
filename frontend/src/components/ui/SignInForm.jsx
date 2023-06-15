@@ -1,12 +1,15 @@
 import { useState, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { TokenContext } from "../../contexts/AuthContext"
+import { VscEye, VscEyeClosed } from "react-icons/vsc"
 import SignUpForm from "./SignUpForm"
 
 const SignInForm = () => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [usernameError, setUsernameError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [loginError, setLoginError] = useState("")
   const tokenContext = useContext(TokenContext)
   const navigate = useNavigate()
   const [showSignUpForm, setShowSignUpForm] = useState(false)
@@ -14,10 +17,12 @@ const SignInForm = () => {
   const handleUsernameChange = (e) => {
     setUsername(e.target.value)
     setUsernameError("")
+    setLoginError("")
   }
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value)
+    setLoginError("")
   }
 
   const handleSubmit = async (e) => {
@@ -51,15 +56,19 @@ const SignInForm = () => {
         navigate("/")
       } else {
         const errorText = await response.text()
-        console.log("Login failed:", errorText)
+        setLoginError("Login failed. Please check your credentials.")
       }
     } catch (error) {
-      console.log("An error occurred:", error)
+      setLoginError("An error occurred. Please try again.")
     }
   }
 
   const toggleSignUpForm = () => {
     setShowSignUpForm(!showSignUpForm)
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword)
   }
 
   return (
@@ -72,6 +81,9 @@ const SignInForm = () => {
             onSubmit={handleSubmit}
             className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
           >
+            {loginError && (
+              <p className="text-red-500 text-xs italic mb-4">{loginError}</p>
+            )}
             <div className="mb-8">
               <label
                 className="block text-gray-700 font-bold mb-2"
@@ -83,7 +95,6 @@ const SignInForm = () => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="username"
                 type="text"
-                placeholder="Username"
                 value={username}
                 onChange={handleUsernameChange}
               />
@@ -98,14 +109,21 @@ const SignInForm = () => {
               >
                 Password
               </label>
-              <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="password"
-                type="password"
-                placeholder="********"
-                value={password}
-                onChange={handlePasswordChange}
-              />
+              <div className="relative">
+                <input
+                  className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={handlePasswordChange}
+                />
+                <div
+                  className="absolute inset-y-0 right-0 flex items-center pr-2 cursor-pointer"
+                  onClick={togglePasswordVisibility}
+                >
+                  {showPassword ? <VscEye /> : <VscEyeClosed />}
+                </div>
+              </div>
             </div>
             <div className="flex items-center justify-between">
               <button

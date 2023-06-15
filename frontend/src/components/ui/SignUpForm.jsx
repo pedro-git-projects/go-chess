@@ -1,12 +1,14 @@
 import { useState, useContext } from "react"
 import { TokenContext } from "../../contexts/AuthContext"
 import { useNavigate } from "react-router-dom"
+import { VscEye, VscEyeClosed } from "react-icons/vsc"
 
 const SignUpForm = ({ toggleSignUpForm }) => {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [usernameError, setUsernameError] = useState("")
   const [error, setError] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [showModal, setShowModal] = useState(false)
   const tokenContext = useContext(TokenContext)
   const navigate = useNavigate()
@@ -20,6 +22,10 @@ const SignUpForm = ({ toggleSignUpForm }) => {
   const handlePasswordChange = (e) => {
     setPassword(e.target.value)
     setError("")
+  }
+
+  const togglePasswordVisibility = () => {
+    setShowPassword((prevState) => !prevState)
   }
 
   const handleSubmit = async (e) => {
@@ -64,7 +70,7 @@ const SignUpForm = ({ toggleSignUpForm }) => {
           console.log("Login successful")
           const token = loginResponse.headers.get("Authorization")
           tokenContext.setToken(token)
-          setShowModal(true) 
+          setShowModal(true)
           setTimeout(() => {
             setShowModal(false) // Close the modal after a delay
             navigate("/") // Navigate after the modal is closed
@@ -122,14 +128,22 @@ const SignUpForm = ({ toggleSignUpForm }) => {
             >
               Password
             </label>
-            <input
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="password"
-              type="password"
-              placeholder="********"
-              value={password}
-              onChange={handlePasswordChange}
-            />
+            <div className="relative">
+              <input
+                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="password"
+                type={showPassword ? "text" : "password"}
+                placeholder="********"
+                value={password}
+                onChange={handlePasswordChange}
+              />
+              <div
+                className="absolute top-2 right-2 cursor-pointer"
+                onClick={togglePasswordVisibility}
+              >
+                {showPassword ? <VscEyeClosed /> : <VscEye />}
+              </div>
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <button
