@@ -9,6 +9,7 @@ import (
 
 	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/token"
 	"github.com/pedro-git-projects/projeto-integrado-frontend/chessapi/pkg/utils"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
@@ -34,8 +35,11 @@ func NewAuthService(db *Database) (*AuthService, error) {
 
 func (a *AuthService) Authenticate(username, password string) bool {
 	for _, user := range a.users {
-		if user.Username == username && user.Password == password {
-			return true
+		if user.Username == username {
+			err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+			if err == nil {
+				return true
+			}
 		}
 	}
 	return false
@@ -175,9 +179,14 @@ func (a *AuthService) Register(username, password string) error {
 		return errors.New(errMsg)
 	}
 
+	hashedPswd, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
 	// Insert the new user into the database
 	query := "INSERT INTO users (username, password) VALUES ($1, $2)"
-	_, err := a.db.db.Exec(query, username, password)
+	_, err = a.db.db.Exec(query, username, hashedPswd)
 	if err != nil {
 		return err
 	}
@@ -185,7 +194,7 @@ func (a *AuthService) Register(username, password string) error {
 	// Create a new user
 	newUser := User{
 		Username: username,
-		Password: password,
+		Password: string(hashedPswd),
 	}
 
 	// Add the user to the list of users in memory
@@ -268,16 +277,19 @@ func HandleChangePassword(authService *AuthService) http.HandlerFunc {
 }
 
 // ChangePassword changes the password of the user with the provided username
+
 func (a *AuthService) ChangePassword(username, newPassword string) error {
-	// Find the user in the list of users
 	for _, user := range a.users {
 		if user.Username == username {
-			// Update the user's password
-			user.Password = newPassword
+			hashedPswd, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+			if err != nil {
+				return err
+			}
+			user.Password = string(hashedPswd)
 
 			// Update the password in the database
 			query := "UPDATE users SET password = $1 WHERE username = $2"
-			_, err := a.db.db.Exec(query, newPassword, username)
+			_, err = a.db.db.Exec(query, hashedPswd, username)
 			if err != nil {
 				return err
 			}
@@ -380,4 +392,42 @@ func (a *AuthService) DeleteUser(username string) error {
 	}
 
 	return nil
+}
+
+func HandleSignout(authService *AuthService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodPost {
+			// Check if the user is authenticated
+			authToken := r.Header.Get("Authorization")
+			if authToken == "" {
+				http.Error(w, "Unauthorized", http.StatusUnauthorized)
+				return
+			}
+
+			// Get the session user from the token
+			sessionUser := authService.GetSessionUser(authToken)
+			if sessionUser == nil {
+				http.Error(w, "Invalid session", http.StatusUnauthorized)
+				return
+			}
+
+			// Remove the session token from the sessions map
+			authService.RemoveSession(authToken)
+
+			// User signout successful
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		// Return an empty response for GET requests
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
+// RemoveSession removes the session with the given authToken from the sessions map
+func (a *AuthService) RemoveSession(authToken string) {
+	a.sessionsMu.Lock()
+	defer a.sessionsMu.Unlock()
+
+	delete(a.sessions, authToken)
 }

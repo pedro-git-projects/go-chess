@@ -1,6 +1,7 @@
 import { useState, useContext } from "react"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { TokenContext } from "../../contexts/AuthContext"
+import SignBtn from "./SignBtn"
 import logo from "../../assets/white_king.svg"
 import DarkReducer from "./DarkReducer"
 
@@ -73,19 +74,7 @@ const Header = () => {
           Account
         </Link>
     	)}
-          {token ? (
-            <Link
-              to={location.pathname}
-              className={`${mobileItem}`}
-              onClick={() => setShowSignOutModal(true)}
-            >
-              Sign out
-            </Link>
-          ) : (
-            <Link to="/signin" className={`${mobileItem}`}>
-              Sign in
-            </Link>
-          )}
+			<SignBtn className={mobileItem}/>
           <DarkReducer className={`${mobileItem}`} />
         </div>
       </button>
@@ -106,19 +95,7 @@ const Header = () => {
           Account
         </Link>
     	)}
-        {token ? (
-          <Link
-            to={location.pathname}
-            className={`${menuItem}`}
-            onClick={() => setShowSignOutModal(true)}
-          >
-            Sign out
-          </Link>
-        ) : (
-          <Link to="/signin" className={`${menuItem}`}>
-            Sign in
-          </Link>
-        )}
+       	<SignBtn className={menuItem}/> 
         <DarkReducer />
       </div>
 

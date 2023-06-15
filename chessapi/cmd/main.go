@@ -28,6 +28,7 @@ func main() {
 	http.HandleFunc("/register", auth.CorsMiddleware(auth.HandleRegistration(authService)))
 	http.HandleFunc("/change-password", auth.CorsMiddleware(auth.HandleChangePassword(authService)))
 	http.HandleFunc("/delete", auth.CorsMiddleware(auth.HandleDeleteUser(authService)))
+	http.HandleFunc("/signout", auth.CorsMiddleware(auth.HandleSignout(authService)))
 	http.Handle("/game", websocket.Handler(srv.gameLoop))
 	fmt.Printf("starting server on port %s\n", port)
 	//	err = http.ListenAndServeTLS(port, "ssl/certs/cert.pem", "ssl/certs/key.pem", nil)
