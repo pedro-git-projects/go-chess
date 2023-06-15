@@ -33,4 +33,3 @@ export const WebsocketProvider = ({ children }) => {
     <WebSocketContext.Provider value={ws}>{children}</WebSocketContext.Provider>
   )
 }
-

@@ -1,11 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom"
 import ChessBoard from "../game/ChessBoard"
 import { Layout } from "../ui/Layout"
-import { useRef, useState, useEffect } from "react"
+import { useRef, useState, useEffect, useContext } from "react"
 import { useWebSocket } from "../../contexts/WebSocketContext"
 import whiteKing from "../../assets/white_king.svg"
 import blackKing from "../../assets/black_king.svg"
 import { handleUpdateRoom } from "../dynamic/Handlers"
+import { TokenContext } from "../../contexts/AuthContext"
 import CopyToClipboard from "../ui/CopyToClipboard"
 
 const Room = () => {
@@ -19,6 +20,7 @@ const Room = () => {
 		location.state?.numberOfClientsInRoom || 1,
 	)
 	const ws = useWebSocket()
+	const token = useContext(TokenContext)
 	const reloadRef = useRef(false)
 
 	useEffect(() => {
@@ -26,6 +28,8 @@ const Room = () => {
 			reloadRef.current = true
 			navigate("/play")
 			return
+		} else if (!token) {
+			navigate("/signin")
 		}
 
 		handleUpdateRoom(ws, (numberOfClientsInRoom) => {
