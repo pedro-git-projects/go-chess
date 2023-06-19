@@ -55,7 +55,6 @@ const SignInForm = () => {
         tokenContext.setToken(token)
         navigate("/")
       } else {
-        const errorText = await response.text()
         setLoginError("Login failed. Please check your credentials.")
       }
     } catch (error) {
@@ -79,14 +78,14 @@ const SignInForm = () => {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+			  className="bg-slate-200 dark:bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4"
           >
             {loginError && (
               <p className="text-red-500 text-xs italic mb-4">{loginError}</p>
             )}
             <div className="mb-8">
               <label
-                className="block text-gray-700 font-bold mb-2"
+				  className="block text-gray-700 dark:text-white font-bold mb-2"
                 htmlFor="username"
               >
                 Username
@@ -104,7 +103,7 @@ const SignInForm = () => {
             </div>
             <div className="mb-8">
               <label
-                className="block text-gray-700 font-bold mb-2"
+				  className="block text-gray-700 dark:text-white font-bold mb-2"
                 htmlFor="password"
               >
                 Password

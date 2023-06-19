@@ -7,7 +7,7 @@ const cpyURL = () => {
 }
 
 const CopyToClipboard = () => (
-  <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" onClick={cpyURL}> 
+  <button className="rounded border border-[#00A29C] bg-[#00A29C] hover:bg-[#3ba8a4] text-white font-bold py-1 px-4 rounded ml-2" onClick={cpyURL}> 
     Copy Code to Clipboard
   </button>
 )

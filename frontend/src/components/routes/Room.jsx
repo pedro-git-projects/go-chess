@@ -49,10 +49,10 @@ const Room = () => {
 	if (numberOfClientsInRoom < 2) {
 		return (
 			<Layout>
-				<div className="min-h-screen flex justify-center items-center bg-gray-100">
-					<div className="text-center max-w-md w-full bg-white shadow-md rounded-lg p-8">
-						<p className="mb-4">Waiting for another player to join...</p>
-						<p className="mb-4">Send them the room code!</p>
+				<div className="min-h-screen flex justify-center items-center">
+					<div className="text-center max-w-md w-full bg-slate-200 dark:bg-gray-800 shadow-md rounded-lg p-8">
+						<p className="mb-4 dark:text-white">Waiting for another player to join...</p>
+						<p className="mb-4 dark:text-white">Send them the room code!</p>
 						<div className="relative">
 							<CopyToClipboard className="w-full" />
 						</div>

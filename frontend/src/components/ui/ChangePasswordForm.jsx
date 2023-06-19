@@ -24,9 +24,6 @@ const ChangePasswordForm = () => {
           new_password: newPassword,
         }),
       })
-      console.log("Response status:", response.status)
-      console.log("Response data:", response.data)
-
       if (!response.ok) {
         const errorData = await response.json()
         throw new Error(errorData.error)
@@ -40,15 +37,15 @@ const ChangePasswordForm = () => {
   }
 
   return (
-    <div className="max-w-md mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Change Password</h2>
+	  <div className="max-w-md mx-auto">
+		<h2 className="text-2xl font-bold mb-4 dark:text-white">Change Password</h2>
       {errorMessage && <div className="text-red-500 mb-4">{errorMessage}</div>}
       {successMessage && (
         <div className="text-green-500 mb-4">{successMessage}</div>
       )}{" "}
       {/* Render success message */}
       <div className="mb-4">
-        <label htmlFor="oldPassword" className="block font-medium mb-1">
+		  <label htmlFor="oldPassword" className="block font-medium mb-1 dark:text-white">
           Old Password
         </label>
         <input
@@ -60,7 +57,7 @@ const ChangePasswordForm = () => {
         />
       </div>
       <div className="mb-4">
-        <label htmlFor="newPassword" className="block font-medium mb-1">
+		  <label htmlFor="newPassword" className="block font-medium mb-1 dark:text-white">
           New Password
         </label>
         <input
@@ -73,7 +70,7 @@ const ChangePasswordForm = () => {
       </div>
       <button
         type="button"
-        className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+        className="rounded border border-[#00A29C] bg-[#00A29C] hover:bg-[#3ba8a4] text-white font-bold py-1 px-4 rounded ml-2"
         onClick={handleChangePassword}
       >
         Change Password

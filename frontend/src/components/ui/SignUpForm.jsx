@@ -53,7 +53,6 @@ const SignUpForm = ({ toggleSignUpForm }) => {
       })
 
       if (registrationResponse.ok) {
-        // Make a login request to obtain the token
         const loginData = {
           username,
           password,
@@ -98,13 +97,13 @@ const SignUpForm = ({ toggleSignUpForm }) => {
       <div className="w-full max-w-md">
         <form
           onSubmit={handleSubmit}
-          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+			className="bg-slate-200 dark:bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4"
         >
           {error && <p className="text-red-500 mb-4">{error}</p>}
 
           <div className="mb-8">
             <label
-              className="block text-gray-700 font-bold mb-2"
+				className="block text-gray-700 dark:text-white font-bold mb-2"
               htmlFor="username"
             >
               Username
@@ -113,7 +112,6 @@ const SignUpForm = ({ toggleSignUpForm }) => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="username"
               type="text"
-              placeholder="Username"
               value={username}
               onChange={handleUsernameChange}
             />
@@ -123,7 +121,7 @@ const SignUpForm = ({ toggleSignUpForm }) => {
           </div>
           <div className="mb-8">
             <label
-              className="block text-gray-700 font-bold mb-2"
+				className="block text-gray-700 dark:text-white font-bold mb-2"
               htmlFor="password"
             >
               Password
@@ -133,7 +131,6 @@ const SignUpForm = ({ toggleSignUpForm }) => {
                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="********"
                 value={password}
                 onChange={handlePasswordChange}
               />
@@ -141,7 +138,7 @@ const SignUpForm = ({ toggleSignUpForm }) => {
                 className="absolute top-2 right-2 cursor-pointer"
                 onClick={togglePasswordVisibility}
               >
-                {showPassword ? <VscEyeClosed /> : <VscEye />}
+                {showPassword ? <VscEye /> : <VscEyeClosed />}
               </div>
             </div>
           </div>
@@ -164,7 +161,7 @@ const SignUpForm = ({ toggleSignUpForm }) => {
       {/* Modal */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-          <div className="bg-white rounded-lg p-6 shadow-lg">
+          <div className="bg-slate-200 rounded-lg p-6 shadow-lg">
             <h2 className="text-xl mb-4">Successful Registration</h2>
             <p className="text-gray-800">
               Congratulations! Your registration was successful.
