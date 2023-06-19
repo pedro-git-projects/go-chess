@@ -144,13 +144,13 @@ const SignUpForm = ({ toggleSignUpForm }) => {
           </div>
           <div className="flex items-center justify-between">
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="rounded bg-[#00ADD8] hover:bg-[#5dc9e2] text-white font-bold py-1 px-4 rounded ml-2"
               type="submit"
             >
               Sign Up
             </button>
             <button
-              className="text-blue-500 hover:text-blue-700 font-bold"
+              className="text-[#00ADD8] hover:text-[#00A29C] font-bold"
               onClick={toggleSignUpForm}
             >
               Back to Sign In
