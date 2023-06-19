@@ -47,7 +47,7 @@ const PlayForm = () => {
             />
             <button
               type="submit"
-              className="block w-full rounded border border-[#00A29C] bg-[#00A29C] hover:bg-[#3ba8a4] text-white font-bold py-1 px-4 rounded ml-2"
+              className="w-full rounded border border-[#00A29C] bg-[#00A29C] hover:bg-[#3ba8a4] text-white font-bold py-1 px-4 rounded ml-2"
             >
               Join
             </button>

@@ -50,7 +50,7 @@ const DeleteAccount = () => {
   return (
     <div style={{ display: "flex", justifyContent: "center" }}>
       <button
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        className="block w-full rounded border w-full sm:w-auto bg-[#CE3262] border-[#CE3262] hover:bg-[#c9426d] border-[#c9426d] text-white font-bold py-2 px-4 rounded mb-4"
         onClick={openModal}
       >
         Delete Account
@@ -59,10 +59,10 @@ const DeleteAccount = () => {
       {/* Delete confirmation modal */}
       {modalOpen && (
         <div className="fixed inset-0 flex items-center justify-center z-50">
-          <div className="bg-white w-96 p-6 rounded-lg">
-            <h2 className="text-lg font-bold mb-4">Confirm Account Deletion</h2>
+			<div className="bg-white dark:bg-gray-800 w-96 p-6 rounded-lg">
+				<h2 className="text-lg font-bold mb-4 dark:text-white">Confirm Account Deletion</h2>
             <div className="mb-4">
-              <label htmlFor="password" className="block font-medium mb-2">
+				<label htmlFor="password" className="block font-medium mb-2 dark:text-white">
                 Password
               </label>
               <input

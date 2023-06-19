@@ -55,7 +55,6 @@ const SignInForm = () => {
         tokenContext.setToken(token)
         navigate("/")
       } else {
-        const errorText = await response.text()
         setLoginError("Login failed. Please check your credentials.")
       }
     } catch (error) {
@@ -79,14 +78,14 @@ const SignInForm = () => {
         ) : (
           <form
             onSubmit={handleSubmit}
-            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
+			  className="bg-slate-200 dark:bg-gray-800 shadow-md rounded px-8 pt-6 pb-8 mb-4"
           >
             {loginError && (
               <p className="text-red-500 text-xs italic mb-4">{loginError}</p>
             )}
             <div className="mb-8">
               <label
-                className="block text-gray-700 font-bold mb-2"
+				  className="block text-gray-700 dark:text-white font-bold mb-2"
                 htmlFor="username"
               >
                 Username
@@ -104,7 +103,7 @@ const SignInForm = () => {
             </div>
             <div className="mb-8">
               <label
-                className="block text-gray-700 font-bold mb-2"
+				  className="block text-gray-700 dark:text-white font-bold mb-2"
                 htmlFor="password"
               >
                 Password
@@ -127,13 +126,13 @@ const SignInForm = () => {
             </div>
             <div className="flex items-center justify-between">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="rounded bg-[#00ADD8] hover:bg-[#5dc9e2] text-white font-bold py-1 px-4 rounded ml-2"
                 type="submit"
               >
                 Sign In
               </button>
               <button
-                className="text-blue-500 hover:text-blue-700 font-bold"
+                className="text-[#00ADD8] hover:text-[#00A29C] font-bold"
                 type="button"
                 onClick={toggleSignUpForm}
               >
