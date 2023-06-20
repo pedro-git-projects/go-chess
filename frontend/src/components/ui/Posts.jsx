@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import PostCard from "./PostCard"
 
-function Posts() {
+const Posts = () => {
   const [posts, setPosts] = useState([])
   const [page, setPage] = useState(1)
   const [loading, setLoading] = useState(true)
