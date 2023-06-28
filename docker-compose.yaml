@@ -1,0 +1,50 @@
+version: "3.9"
+services:
+  db:
+    image: postgres:15.3
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: your_username
+      POSTGRES_PASSWORD: your_password
+      POSTGRES_DB: chess
+
+  chessapi:
+    build:
+      context: ./chessapi
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U your_username -d chess -h db"]
+      interval: 5s
+      timeout: 10s
+      retries: 3
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: your_username
+      DB_PASSWORD: your_password
+      DB_NAME: chess
+      DB_CONNECTION_STRING: postgres://postgres@db/chess?sslmode=disable
+
+  blogapi:
+    build:
+      context: ./blogapi
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "1337:1337"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - "5173:5173"
+

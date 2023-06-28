@@ -14,7 +14,14 @@ import (
 var port = ":8080"
 
 func main() {
-	db, err := auth.NewDatabase()
+	connStr := os.Getenv("DB_CONNECTION_STRING")
+
+	if connStr == "" {
+		fmt.Println("DB_CONNECTION_STRING environment variable not set")
+		return
+	}
+
+	db, err := auth.NewDatabase(connStr)
 	if err != nil {
 		log.Fatal(err)
 	}

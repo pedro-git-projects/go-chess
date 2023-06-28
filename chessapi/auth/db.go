@@ -6,8 +6,7 @@ type Database struct {
 	db *sql.DB
 }
 
-func NewDatabase() (*Database, error) {
-	connStr := "postgres://postgres@localhost/chess?sslmode=disable"
+func NewDatabase(connStr string) (*Database, error) {
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err

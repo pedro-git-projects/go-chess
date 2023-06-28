@@ -24,3 +24,5 @@ dev:
 	cd ./frontend/; npm run dev
 doc:
 	cd ./cmd/; godoc -http=:6060
+up:
+	docker-compose up -d
