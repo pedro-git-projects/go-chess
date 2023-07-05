@@ -31,6 +31,7 @@ It works by opening a websocket connection that is used to pass messages back an
 - **Go** - The programming language used for the backend
 - **React** - The library used for the frontend
 - **WebSockets** - The communication protocol used between the frontend and the backend
+- **PostgreSQL** - The database system
 
 ## Requirements 
 
@@ -41,6 +42,8 @@ It works by opening a websocket connection that is used to pass messages back an
 - Node.js
 
 - NPM 
+
+- PostgreSQL
 
 ## Installation
 
@@ -55,6 +58,14 @@ git clone https://github.com/pedro-git-projects/projeto-integrado-frontend
 ```bash
 make install 
 ```
+
+3. Run the script to setup PostgreSQL
+
+```
+./database.sh
+```
+
+If the script fails with role "<\your user\>" does not exist, make sure you have the adequate permissions to connect to PostgreSQL.
 
 ## Running the application
 
